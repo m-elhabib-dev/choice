@@ -44,7 +44,3 @@ app/src/main/kotlin/com/choice/app/
 # Run instrumented tests
 ./gradlew connectedAndroidTest
 ```
-
-## License
-
-MIT

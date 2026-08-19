@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface CoinRepository {
     fun observeCoins(): Flow<List<CoinWithChoices>>
 
-    fun observeQuickAccessCoins(limit: Int = 5): Flow<List<CoinWithChoices>>
+    fun observeQuickCoins(): Flow<List<CoinWithChoices>>
 
     fun observeCoin(coinId: Long): Flow<CoinWithChoices?>
 
@@ -15,4 +15,20 @@ interface CoinRepository {
     suspend fun deleteCoin(coinId: Long)
 
     suspend fun recordInteraction(coinId: Long)
+
+    suspend fun setFavorite(coinId: Long, isFavorite: Boolean)
+
+    suspend fun recordDecision(coinId: Long, choiceId: Long, choiceTextSnapshot: String)
+
+    suspend fun reorderChoices(coinId: Long, orderedChoiceIds: List<Long>)
+
+    suspend fun setWeightedEnabled(coinId: Long, enabled: Boolean)
+
+    suspend fun setAvoidLastResultEnabled(coinId: Long, enabled: Boolean)
+
+    suspend fun updateChoiceWeights(coinId: Long, weights: List<Pair<Long, Int?>>)
+
+    suspend fun getLastDecision(coinId: Long): com.choice.app.domain.Decision?
+
+    fun observeDecisionHistory(coinId: Long): Flow<List<com.choice.app.domain.Decision>>
 }

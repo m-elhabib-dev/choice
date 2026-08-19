@@ -31,6 +31,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,8 +93,28 @@ fun CoinEditScreen(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
+                    IconButton(
+                        onClick = { viewModel.moveChoiceUp(index) },
+                        enabled = index > 0,
+                        modifier = Modifier.semantics { contentDescription = "Move up" },
+                    ) {
+                        Text(
+                            text = "\u25B2",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.moveChoiceDown(index) },
+                        enabled = index < uiState.choices.size - 1,
+                        modifier = Modifier.semantics { contentDescription = "Move down" },
+                    ) {
+                        Text(
+                            text = "\u25BC",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                     OutlinedTextField(
                         value = choice.text,
                         onValueChange = { if (it.length <= 60) viewModel.updateChoice(index, it) },

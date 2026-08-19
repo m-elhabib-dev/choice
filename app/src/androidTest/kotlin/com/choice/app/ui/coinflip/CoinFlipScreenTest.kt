@@ -53,6 +53,7 @@ class CoinFlipScreenTest {
                 viewModel = viewModel,
                 onBack = {},
                 onEditCoin = {},
+                onSettings = {},
             )
         }
 
@@ -88,6 +89,7 @@ class CoinFlipScreenTest {
                 viewModel = viewModel,
                 onBack = {},
                 onEditCoin = {},
+                onSettings = {},
             )
         }
 
@@ -112,6 +114,7 @@ class CoinFlipScreenTest {
                 viewModel = viewModel,
                 onBack = {},
                 onEditCoin = {},
+                onSettings = {},
             )
         }
 

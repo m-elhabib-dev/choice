@@ -15,12 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -109,10 +111,10 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(padding),
             ) {
-                if (uiState.quickAccessCoins.isNotEmpty()) {
+                if (uiState.quickCoins.isNotEmpty()) {
                     item {
                         Text(
-                            text = "Quick Access",
+                            text = "Quick Coins",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.SemiBold,
@@ -120,15 +122,17 @@ fun MainScreen(
                         )
                     }
 
-                    items(uiState.quickAccessCoins) { coin ->
+                    items(uiState.quickCoins) { coin ->
                         CoinCard(
                             name = coin.name,
                             choiceCount = coin.choiceCount,
+                            isFavorite = coin.isFavorite,
                             onClick = {
                                 viewModel.openCoin(coin.id)
                                 onCoinClick(coin.id)
                             },
                             onEdit = { onEditCoin(coin.id) },
+                            onToggleFavorite = { viewModel.toggleFavorite(coin.id) },
                             onDelete = { viewModel.requestDelete(coin.id) },
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                         )
@@ -153,11 +157,13 @@ fun MainScreen(
                     CoinCard(
                         name = coin.name,
                         choiceCount = coin.choiceCount,
+                        isFavorite = coin.isFavorite,
                         onClick = {
                             viewModel.openCoin(coin.id)
                             onCoinClick(coin.id)
                         },
                         onEdit = { onEditCoin(coin.id) },
+                        onToggleFavorite = { viewModel.toggleFavorite(coin.id) },
                         onDelete = { viewModel.requestDelete(coin.id) },
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     )
@@ -172,8 +178,10 @@ fun MainScreen(
 private fun CoinCard(
     name: String,
     choiceCount: Int,
+    isFavorite: Boolean,
     onClick: () -> Unit,
     onEdit: () -> Unit,
+    onToggleFavorite: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -201,7 +209,7 @@ private fun CoinCard(
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -209,6 +217,13 @@ private fun CoinCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                IconButton(onClick = onToggleFavorite) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                        contentDescription = if (isFavorite) "Remove from Quick Coins" else "Add to Quick Coins",
+                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Filled.Edit,

@@ -25,4 +25,6 @@ data class ChoiceEntity(
     val coinId: Long,
     val text: String,
     val position: Int,
+    @ColumnInfo(name = "weight")
+    val weight: Int? = null,
 )

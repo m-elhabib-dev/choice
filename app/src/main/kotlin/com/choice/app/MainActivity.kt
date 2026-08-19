@@ -15,6 +15,7 @@ import androidx.navigation.navArgument
 import com.choice.app.ui.CoinViewModelFactory
 import com.choice.app.ui.coinedit.CoinEditScreen
 import com.choice.app.ui.coinflip.CoinFlipScreen
+import com.choice.app.ui.coinsettings.CoinSettingsScreen
 import com.choice.app.ui.main.MainScreen
 import com.choice.app.ui.theme.ChoiceTheme
 
@@ -67,6 +68,7 @@ private fun ChoiceNavHost() {
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onEditCoin = { navController.navigate("coinedit/$coinId") },
+                onSettings = { navController.navigate("coinsettings/$coinId") },
             )
         }
 
@@ -85,6 +87,20 @@ private fun ChoiceNavHost() {
             val viewModel: com.choice.app.ui.coinedit.CoinEditViewModel =
                 viewModel(factory = factory)
             CoinEditScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = "coinsettings/{coinId}",
+            arguments = listOf(navArgument("coinId") { type = NavType.LongType }),
+        ) { backStackEntry ->
+            val coinId = backStackEntry.arguments?.getLong("coinId") ?: return@composable
+            val factory = CoinViewModelFactory(appContainer.coinRepository, coinId)
+            val viewModel: com.choice.app.ui.coinsettings.CoinSettingsViewModel =
+                viewModel(factory = factory)
+            CoinSettingsScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
             )

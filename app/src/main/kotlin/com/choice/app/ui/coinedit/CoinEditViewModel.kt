@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ChoiceFieldState(
+    val id: Long? = null,
     val text: String = "",
     val error: String? = null,
 )
@@ -24,6 +25,7 @@ data class CoinEditUiState(
     val canSave: Boolean = false,
     val isSaved: Boolean = false,
     val removeError: String? = null,
+    val orderChanged: Boolean = false,
 )
 
 class CoinEditViewModel(
@@ -35,6 +37,7 @@ class CoinEditViewModel(
     val uiState: StateFlow<CoinEditUiState> = _uiState.asStateFlow()
 
     private var showErrors = false
+    private var originalChoiceIds: List<Long> = emptyList()
 
     val canRemoveChoice: Boolean
         get() = _uiState.value.choices.size > 2
@@ -57,12 +60,13 @@ class CoinEditViewModel(
         viewModelScope.launch {
             val coinWithChoices = coinRepository.observeCoin(coinId).firstOrNull()
             if (coinWithChoices != null) {
+                originalChoiceIds = coinWithChoices.choices.map { it.id }
                 _uiState.update {
                     it.copy(
                         coinId = coinWithChoices.coin.id,
                         name = coinWithChoices.coin.name,
                         choices = coinWithChoices.choices.map { choice ->
-                            ChoiceFieldState(text = choice.text)
+                            ChoiceFieldState(id = choice.id, text = choice.text)
                         },
                     )
                 }
@@ -99,6 +103,31 @@ class CoinEditViewModel(
         }
         _uiState.update { state ->
             state.copy(choices = state.choices.filterIndexed { i, _ -> i != index }, removeError = null)
+        }
+        recompute()
+    }
+
+    fun moveChoiceUp(index: Int) {
+        if (index <= 0) return
+        _uiState.update { state ->
+            val choices = state.choices.toMutableList()
+            val temp = choices[index]
+            choices[index] = choices[index - 1]
+            choices[index - 1] = temp
+            state.copy(choices = choices, orderChanged = true)
+        }
+        recompute()
+    }
+
+    fun moveChoiceDown(index: Int) {
+        val choices = _uiState.value.choices
+        if (index >= choices.size - 1) return
+        _uiState.update { state ->
+            val mutableChoices = state.choices.toMutableList()
+            val temp = mutableChoices[index]
+            mutableChoices[index] = mutableChoices[index + 1]
+            mutableChoices[index + 1] = temp
+            state.copy(choices = mutableChoices, orderChanged = true)
         }
         recompute()
     }

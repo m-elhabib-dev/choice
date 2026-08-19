@@ -4,6 +4,7 @@ import com.choice.app.data.local.CoinDao
 import com.choice.app.data.local.CoinEntity
 import com.choice.app.data.local.CoinWithChoicesRelation
 import com.choice.app.data.local.ChoiceEntity
+import com.choice.app.data.local.DecisionEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -16,7 +17,7 @@ class CoinRepositoryImplSaveValidationTest {
     private fun fakeDao(): CoinDao = object : CoinDao {
         override fun observeCoins(): Flow<List<CoinWithChoicesRelation>> = flowOf(emptyList())
 
-        override fun observeCoinsWithInteractions(): Flow<List<CoinWithChoicesRelation>> =
+        override fun observeQuickCoins(): Flow<List<CoinWithChoicesRelation>> =
             flowOf(emptyList())
 
         override fun observeCoin(coinId: Long): Flow<CoinWithChoicesRelation?> = flowOf(null)
@@ -29,8 +30,21 @@ class CoinRepositoryImplSaveValidationTest {
 
         override suspend fun recordInteraction(coinId: Long, now: Long) {}
 
+        override suspend fun setFavorite(coinId: Long, isFavorite: Boolean) {}
+
         override suspend fun deleteCoinById(coinId: Long) {}
-    }
+
+        override suspend fun insertDecision(decision: DecisionEntity): Long = decision.id
+
+        override fun observeDecisionsByCoinId(coinId: Long): Flow<List<DecisionEntity>> = flowOf(emptyList())
+
+        override suspend fun getLastDecisionByCoinId(coinId: Long): DecisionEntity? = null
+
+            override suspend fun updateChoicePosition(choiceId: Long, position: Int) {}
+            override suspend fun setWeightedEnabled(coinId: Long, enabled: Boolean) {}
+            override suspend fun setAvoidLastResultEnabled(coinId: Long, enabled: Boolean) {}
+            override suspend fun updateChoiceWeight(choiceId: Long, weight: Int?) {}
+        }
 
     private val validChoices = listOf("Ful", "Eggs")
 

@@ -4,11 +4,12 @@ import com.choice.app.data.local.CoinDao
 import com.choice.app.data.local.CoinEntity
 import com.choice.app.data.local.CoinWithChoicesRelation
 import com.choice.app.data.local.ChoiceEntity
+import com.choice.app.data.local.DecisionEntity
 import com.choice.app.domain.Coin
 import com.choice.app.domain.CoinSummary
 import com.choice.app.domain.CoinWithChoices
 import com.choice.app.domain.Choice
-import com.choice.app.domain.QuickAccessScore
+import com.choice.app.domain.Decision
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -19,22 +20,8 @@ class CoinRepositoryImpl(
     override fun observeCoins(): Flow<List<CoinWithChoices>> =
         coinDao.observeCoins().map { relations -> relations.map { it.toDomain() } }
 
-    override fun observeQuickAccessCoins(limit: Int): Flow<List<CoinWithChoices>> =
-        coinDao.observeCoinsWithInteractions().map { relations ->
-            relations
-                .map { it.toDomain() }
-                .map { coinWithChoices ->
-                    val coin = coinWithChoices.coin
-                    coinWithChoices to QuickAccessScore.compute(
-                        coin.interactionCount,
-                        coin.lastInteractionAt,
-                    )
-                }
-                .filter { (_, score) -> score > 0.0 }
-                .sortedByDescending { (_, score) -> score }
-                .take(limit)
-                .map { (coinWithChoices, _) -> coinWithChoices }
-        }
+    override fun observeQuickCoins(): Flow<List<CoinWithChoices>> =
+        coinDao.observeQuickCoins().map { relations -> relations.map { it.toDomain() } }
 
     override fun observeCoin(coinId: Long): Flow<CoinWithChoices?> =
         coinDao.observeCoin(coinId).map { it?.toDomain() }
@@ -79,6 +66,67 @@ class CoinRepositoryImpl(
     override suspend fun recordInteraction(coinId: Long) {
         coinDao.recordInteraction(coinId)
     }
+
+    override suspend fun setFavorite(coinId: Long, isFavorite: Boolean) {
+        coinDao.setFavorite(coinId, isFavorite)
+    }
+
+    override suspend fun recordDecision(coinId: Long, choiceId: Long, choiceTextSnapshot: String) {
+        coinDao.insertDecision(
+            DecisionEntity(
+                coinId = coinId,
+                choiceId = choiceId,
+                choiceTextSnapshot = choiceTextSnapshot,
+            )
+        )
+    }
+
+    override suspend fun reorderChoices(coinId: Long, orderedChoiceIds: List<Long>) {
+        orderedChoiceIds.forEachIndexed { index, choiceId ->
+            coinDao.updateChoicePosition(choiceId, index)
+        }
+    }
+
+    override suspend fun setWeightedEnabled(coinId: Long, enabled: Boolean) {
+        coinDao.setWeightedEnabled(coinId, enabled)
+    }
+
+    override suspend fun setAvoidLastResultEnabled(coinId: Long, enabled: Boolean) {
+        coinDao.setAvoidLastResultEnabled(coinId, enabled)
+    }
+
+    override suspend fun updateChoiceWeights(coinId: Long, weights: List<Pair<Long, Int?>>) {
+        weights.forEach { (choiceId, weight) ->
+            if (weight != null) {
+                require(weight >= 1) { "Weight must be a positive whole number" }
+            }
+            coinDao.updateChoiceWeight(choiceId, weight)
+        }
+    }
+
+    override suspend fun getLastDecision(coinId: Long): Decision? {
+        val entity = coinDao.getLastDecisionByCoinId(coinId) ?: return null
+        return Decision(
+            id = entity.id,
+            coinId = entity.coinId,
+            choiceId = entity.choiceId,
+            choiceTextSnapshot = entity.choiceTextSnapshot,
+            decidedAt = entity.decidedAt,
+        )
+    }
+
+    override fun observeDecisionHistory(coinId: Long): Flow<List<Decision>> =
+        coinDao.observeDecisionsByCoinId(coinId).map { entities ->
+            entities.map { entity ->
+                Decision(
+                    id = entity.id,
+                    coinId = entity.coinId,
+                    choiceId = entity.choiceId,
+                    choiceTextSnapshot = entity.choiceTextSnapshot,
+                    decidedAt = entity.decidedAt,
+                )
+            }
+        }
 }
 
 private fun CoinWithChoicesRelation.toDomain(): CoinWithChoices =
@@ -89,6 +137,9 @@ private fun CoinWithChoicesRelation.toDomain(): CoinWithChoices =
             createdAt = coin.createdAt,
             interactionCount = coin.interactionCount,
             lastInteractionAt = coin.lastInteractionAt,
+            isFavorite = coin.isFavorite,
+            weightedEnabled = coin.weightedEnabled,
+            avoidLastResultEnabled = coin.avoidLastResultEnabled,
         ),
         choices = choices
             .sortedBy { it.position }
@@ -98,6 +149,7 @@ private fun CoinWithChoicesRelation.toDomain(): CoinWithChoices =
                     coinId = choice.coinId,
                     text = choice.text,
                     position = choice.position,
+                    weight = choice.weight,
                 )
             },
     )

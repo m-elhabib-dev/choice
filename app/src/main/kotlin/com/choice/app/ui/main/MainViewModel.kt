@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class MainScreenUiState(
-    val quickAccessCoins: List<CoinSummary> = emptyList(),
+    val quickCoins: List<CoinSummary> = emptyList(),
     val allCoins: List<CoinSummary> = emptyList(),
     val isEmpty: Boolean = false,
     val deleteConfirmation: DeleteCoinConfirmationState? = null,
@@ -29,15 +29,16 @@ class MainViewModel(
     init {
         viewModelScope.launch {
             combine(
-                coinRepository.observeQuickAccessCoins(),
+                coinRepository.observeQuickCoins(),
                 coinRepository.observeCoins(),
-            ) { quickAccess, all ->
+            ) { quickCoins, all ->
                 MainScreenUiState(
-                    quickAccessCoins = quickAccess.map { coinWithChoices ->
+                    quickCoins = quickCoins.map { coinWithChoices ->
                         CoinSummary(
                             id = coinWithChoices.coin.id,
                             name = coinWithChoices.coin.name,
                             choiceCount = coinWithChoices.choices.size,
+                            isFavorite = true,
                         )
                     },
                     allCoins = all.map { coinWithChoices ->
@@ -45,13 +46,14 @@ class MainViewModel(
                             id = coinWithChoices.coin.id,
                             name = coinWithChoices.coin.name,
                             choiceCount = coinWithChoices.choices.size,
+                            isFavorite = coinWithChoices.coin.isFavorite,
                         )
                     },
                     isEmpty = all.isEmpty(),
                 )
             }.collect { state ->
                 _uiState.update { it.copy(
-                    quickAccessCoins = state.quickAccessCoins,
+                    quickCoins = state.quickCoins,
                     allCoins = state.allCoins,
                     isEmpty = state.isEmpty,
                 ) }
@@ -62,6 +64,13 @@ class MainViewModel(
     fun openCoin(coinId: Long) {
         viewModelScope.launch {
             coinRepository.recordInteraction(coinId)
+        }
+    }
+
+    fun toggleFavorite(coinId: Long) {
+        viewModelScope.launch {
+            val isCurrentlyFavorite = _uiState.value.quickCoins.any { it.id == coinId }
+            coinRepository.setFavorite(coinId, !isCurrentlyFavorite)
         }
     }
 

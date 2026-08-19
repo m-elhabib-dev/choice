@@ -6,6 +6,9 @@ data class Coin(
     val createdAt: Long,
     val interactionCount: Int,
     val lastInteractionAt: Long?,
+    val isFavorite: Boolean = false,
+    val weightedEnabled: Boolean = false,
+    val avoidLastResultEnabled: Boolean = false,
 )
 
 data class Choice(
@@ -13,6 +16,7 @@ data class Choice(
     val coinId: Long,
     val text: String,
     val position: Int,
+    val weight: Int? = null,
 )
 
 data class CoinWithChoices(
@@ -24,4 +28,5 @@ data class CoinSummary(
     val id: Long,
     val name: String,
     val choiceCount: Int,
+    val isFavorite: Boolean = false,
 )

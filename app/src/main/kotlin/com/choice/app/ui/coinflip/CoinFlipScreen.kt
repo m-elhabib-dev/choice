@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,6 +37,7 @@ fun CoinFlipScreen(
     viewModel: CoinFlipViewModel,
     onBack: () -> Unit,
     onEditCoin: (Long) -> Unit,
+    onSettings: (Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -51,6 +54,12 @@ fun CoinFlipScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { onSettings(uiState.coinId) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Coin settings",
+                        )
+                    }
                     IconButton(onClick = { onEditCoin(uiState.coinId) }) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
@@ -86,7 +95,7 @@ fun CoinFlipScreen(
                 }
             } else {
                 Text(
-                    text = "Your decision:",
+                    text = if (uiState.accepted) "Decision accepted" else "Your decision:",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -100,6 +109,32 @@ fun CoinFlipScreen(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )
+
+                if (!uiState.accepted) {
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = { viewModel.accept() },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = "Accept",
+                            fontSize = 18.sp,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedButton(
+                        onClick = { viewModel.flipAgain() },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = "Flip again",
+                            fontSize = 16.sp,
+                        )
+                    }
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.choice.app.data.CoinRepository
 import com.choice.app.ui.coinflip.CoinFlipViewModel
 import com.choice.app.ui.coinedit.CoinEditViewModel
+import com.choice.app.ui.coinsettings.CoinSettingsViewModel
 import com.choice.app.ui.main.MainViewModel
 
 class CoinViewModelFactory(
@@ -20,6 +21,8 @@ class CoinViewModelFactory(
                 MainViewModel(coinRepository) as T
             modelClass.isAssignableFrom(CoinEditViewModel::class.java) ->
                 CoinEditViewModel(coinRepository, coinId) as T
+            modelClass.isAssignableFrom(CoinSettingsViewModel::class.java) ->
+                CoinSettingsViewModel(coinRepository, coinId ?: -1L) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

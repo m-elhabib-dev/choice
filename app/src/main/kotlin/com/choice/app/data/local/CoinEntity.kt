@@ -15,4 +15,10 @@ data class CoinEntity(
     val createdAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "last_interaction_at")
     val lastInteractionAt: Long? = null,
+    @ColumnInfo(name = "is_favorite", defaultValue = "0")
+    val isFavorite: Boolean = false,
+    @ColumnInfo(name = "weighted_enabled", defaultValue = "0")
+    val weightedEnabled: Boolean = false,
+    @ColumnInfo(name = "avoid_last_result_enabled", defaultValue = "0")
+    val avoidLastResultEnabled: Boolean = false,
 )

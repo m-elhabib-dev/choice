@@ -4,6 +4,7 @@ import com.choice.app.data.local.CoinDao
 import com.choice.app.data.local.CoinEntity
 import com.choice.app.data.local.CoinWithChoicesRelation
 import com.choice.app.data.local.ChoiceEntity
+import com.choice.app.data.local.DecisionEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -22,7 +23,7 @@ class CoinRepositoryImplUpdateTest {
 
     private fun fakeDao(): CoinDao = object : CoinDao {
         override fun observeCoins(): Flow<List<CoinWithChoicesRelation>> = flowOf(emptyList())
-        override fun observeCoinsWithInteractions(): Flow<List<CoinWithChoicesRelation>> = flowOf(emptyList())
+        override fun observeQuickCoins(): Flow<List<CoinWithChoicesRelation>> = flowOf(emptyList())
         override fun observeCoin(coinId: Long): Flow<CoinWithChoicesRelation?> = flowOf(null)
         override suspend fun insertCoin(coin: CoinEntity): Long {
             val id = if (coin.id == 0L) nextId++ else coin.id
@@ -36,8 +37,16 @@ class CoinRepositoryImplUpdateTest {
             storedChoices.remove(coinId)
         }
         override suspend fun recordInteraction(coinId: Long, now: Long) {}
+        override suspend fun setFavorite(coinId: Long, isFavorite: Boolean) {}
         override suspend fun deleteCoinById(coinId: Long) {}
-    }
+        override suspend fun insertDecision(decision: DecisionEntity): Long = decision.id
+        override fun observeDecisionsByCoinId(coinId: Long): Flow<List<DecisionEntity>> = flowOf(emptyList())
+        override suspend fun getLastDecisionByCoinId(coinId: Long): DecisionEntity? = null
+            override suspend fun updateChoicePosition(choiceId: Long, position: Int) {}
+            override suspend fun setWeightedEnabled(coinId: Long, enabled: Boolean) {}
+            override suspend fun setAvoidLastResultEnabled(coinId: Long, enabled: Boolean) {}
+            override suspend fun updateChoiceWeight(choiceId: Long, weight: Int?) {}
+        }
 
     private suspend fun createCoin(name: String, choices: List<String>): Long {
         val repo = CoinRepositoryImpl(fakeDao())

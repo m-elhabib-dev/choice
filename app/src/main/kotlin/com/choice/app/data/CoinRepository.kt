@@ -1,6 +1,7 @@
 package com.choice.app.data
 
 import com.choice.app.domain.CoinWithChoices
+import com.choice.app.domain.SharedCoin
 import kotlinx.coroutines.flow.Flow
 
 interface CoinRepository {
@@ -31,4 +32,6 @@ interface CoinRepository {
     suspend fun getLastDecision(coinId: Long): com.choice.app.domain.Decision?
 
     fun observeDecisionHistory(coinId: Long): Flow<List<com.choice.app.domain.Decision>>
+
+    suspend fun importSharedCoin(payload: SharedCoin): Long
 }

@@ -1,5 +1,6 @@
 package com.choice.app.ui.coinflip
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,8 +42,12 @@ fun CoinFlipScreen(
     onBack: () -> Unit,
     onEditCoin: (Long) -> Unit,
     onSettings: (Long) -> Unit,
+    onHistory: (Long) -> Unit,
+    onShare: (Long) -> Unit = {},
+    onImport: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -54,6 +62,26 @@ fun CoinFlipScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        val payload = viewModel.generateSharePayload()
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, payload)
+                        }
+                        context.startActivity(Intent.createChooser(sendIntent, "Share coin"))
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = "Share coin",
+                        )
+                    }
+                    IconButton(onClick = { onHistory(uiState.coinId) }) {
+                        Icon(
+                            imageVector = Icons.Filled.List,
+                            contentDescription = "Decision history",
+                        )
+                    }
                     IconButton(onClick = { onSettings(uiState.coinId) }) {
                         Icon(
                             imageVector = Icons.Filled.Settings,

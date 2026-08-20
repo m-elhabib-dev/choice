@@ -31,6 +31,8 @@ data class CoinEditUiState(
 class CoinEditViewModel(
     private val coinRepository: CoinRepository,
     private val coinId: Long?,
+    private val templateName: String? = null,
+    private val templateChoices: List<String>? = null,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CoinEditUiState())
@@ -44,11 +46,21 @@ class CoinEditViewModel(
 
     init {
         if (coinId == null) {
-            _uiState.update {
-                it.copy(
-                    coinId = null,
-                    choices = listOf(ChoiceFieldState(), ChoiceFieldState()),
-                )
+            if (templateName != null && templateChoices != null) {
+                _uiState.update {
+                    it.copy(
+                        coinId = null,
+                        name = templateName,
+                        choices = templateChoices.map { text -> ChoiceFieldState(text = text) },
+                    )
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        coinId = null,
+                        choices = listOf(ChoiceFieldState(), ChoiceFieldState()),
+                    )
+                }
             }
             recompute()
         } else {

@@ -51,6 +51,7 @@ class CoinFlipScreenAcceptOverrideTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -78,6 +79,7 @@ class CoinFlipScreenAcceptOverrideTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -104,6 +106,7 @@ class CoinFlipScreenAcceptOverrideTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -130,6 +133,7 @@ class CoinFlipScreenAcceptOverrideTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -162,6 +166,7 @@ class CoinFlipScreenAcceptOverrideTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -202,6 +207,7 @@ class CoinFlipScreenAcceptOverrideTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -235,6 +241,7 @@ class CoinFlipScreenAcceptOverrideTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 

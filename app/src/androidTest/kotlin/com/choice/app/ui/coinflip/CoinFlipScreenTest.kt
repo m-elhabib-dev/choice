@@ -54,6 +54,7 @@ class CoinFlipScreenTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -90,6 +91,7 @@ class CoinFlipScreenTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 
@@ -115,6 +117,7 @@ class CoinFlipScreenTest {
                 onBack = {},
                 onEditCoin = {},
                 onSettings = {},
+                onHistory = {},
             )
         }
 

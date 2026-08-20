@@ -3,6 +3,9 @@ package com.choice.app.ui.coinflip
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.choice.app.data.CoinRepository
+import com.choice.app.domain.SharedCoin
+import com.choice.app.domain.SharedChoice
+import com.choice.app.domain.encodeSharedCoin
 import com.choice.app.domain.selectChoice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +22,8 @@ data class CoinFlipUiState(
     val resultChoiceId: Long? = null,
     val accepted: Boolean = false,
     val canRemoveChoice: Boolean = true,
+    val weightedEnabled: Boolean = false,
+    val avoidLastResultEnabled: Boolean = false,
 )
 
 class CoinFlipViewModel(
@@ -46,6 +51,8 @@ class CoinFlipViewModel(
                         resultChoiceId = null,
                         accepted = false,
                         canRemoveChoice = coinWithChoices.choices.size > 2,
+                        weightedEnabled = coinWithChoices.coin.weightedEnabled,
+                        avoidLastResultEnabled = coinWithChoices.coin.avoidLastResultEnabled,
                     )
                 }
             }
@@ -93,5 +100,17 @@ class CoinFlipViewModel(
     fun flipAgain() {
         _uiState.update { it.copy(result = null, resultChoiceId = null, accepted = false) }
         flip()
+    }
+
+    fun generateSharePayload(): String {
+        val state = _uiState.value
+        val coin = SharedCoin(
+            schemaVersion = 1,
+            name = state.coinName,
+            choices = state.choices.map { SharedChoice(text = it, weight = null) },
+            weightedEnabled = state.weightedEnabled,
+            avoidLastResultEnabled = state.avoidLastResultEnabled,
+        )
+        return encodeSharedCoin(coin)
     }
 }

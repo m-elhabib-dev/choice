@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.choice.app.data.CoinRepository
 import com.choice.app.domain.Choice
+import com.choice.app.domain.SharedCoin
+import com.choice.app.domain.SharedChoice
+import com.choice.app.domain.encodeSharedCoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -126,5 +129,22 @@ class CoinSettingsViewModel(
             coinRepository.updateChoiceWeights(coinId, validatedWeights)
             _uiState.update { it.copy(isSaved = true) }
         }
+    }
+
+    fun generateSharePayload(): String {
+        val state = _uiState.value
+        val coin = SharedCoin(
+            schemaVersion = 1,
+            name = state.coinName,
+            choices = state.choiceWeights.map { field ->
+                SharedChoice(
+                    text = field.choiceText,
+                    weight = field.weightText.toIntOrNull(),
+                )
+            },
+            weightedEnabled = state.weightedEnabled,
+            avoidLastResultEnabled = state.avoidLastResultEnabled,
+        )
+        return encodeSharedCoin(coin)
     }
 }

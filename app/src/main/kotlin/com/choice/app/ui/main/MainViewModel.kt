@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.choice.app.data.CoinRepository
 import com.choice.app.domain.CoinSummary
+import com.choice.app.domain.matchesSearchQuery
 import com.choice.app.ui.components.DeleteCoinConfirmationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,10 @@ import kotlinx.coroutines.launch
 data class MainScreenUiState(
     val quickCoins: List<CoinSummary> = emptyList(),
     val allCoins: List<CoinSummary> = emptyList(),
+    val filteredAllCoins: List<CoinSummary> = emptyList(),
     val isEmpty: Boolean = false,
+    val isNoResults: Boolean = false,
+    val searchQuery: String = "",
     val deleteConfirmation: DeleteCoinConfirmationState? = null,
 )
 
@@ -32,6 +36,14 @@ class MainViewModel(
                 coinRepository.observeQuickCoins(),
                 coinRepository.observeCoins(),
             ) { quickCoins, all ->
+                val allSummaries = all.map { coinWithChoices ->
+                    CoinSummary(
+                        id = coinWithChoices.coin.id,
+                        name = coinWithChoices.coin.name,
+                        choiceCount = coinWithChoices.choices.size,
+                        isFavorite = coinWithChoices.coin.isFavorite,
+                    )
+                }
                 MainScreenUiState(
                     quickCoins = quickCoins.map { coinWithChoices ->
                         CoinSummary(
@@ -41,21 +53,22 @@ class MainViewModel(
                             isFavorite = true,
                         )
                     },
-                    allCoins = all.map { coinWithChoices ->
-                        CoinSummary(
-                            id = coinWithChoices.coin.id,
-                            name = coinWithChoices.coin.name,
-                            choiceCount = coinWithChoices.choices.size,
-                            isFavorite = coinWithChoices.coin.isFavorite,
-                        )
-                    },
+                    allCoins = allSummaries,
                     isEmpty = all.isEmpty(),
                 )
             }.collect { state ->
+                val query = _uiState.value.searchQuery
+                val filtered = if (query.isBlank()) {
+                    state.allCoins
+                } else {
+                    state.allCoins.filter { matchesSearchQuery(it.name, query) }
+                }
                 _uiState.update { it.copy(
                     quickCoins = state.quickCoins,
                     allCoins = state.allCoins,
+                    filteredAllCoins = filtered,
                     isEmpty = state.isEmpty,
+                    isNoResults = filtered.isEmpty() && !state.isEmpty,
                 ) }
             }
         }
@@ -71,6 +84,21 @@ class MainViewModel(
         viewModelScope.launch {
             val isCurrentlyFavorite = _uiState.value.quickCoins.any { it.id == coinId }
             coinRepository.setFavorite(coinId, !isCurrentlyFavorite)
+        }
+    }
+
+    fun updateSearchQuery(query: String) {
+        val filtered = if (query.isBlank()) {
+            _uiState.value.allCoins
+        } else {
+            _uiState.value.allCoins.filter { matchesSearchQuery(it.name, query) }
+        }
+        _uiState.update {
+            it.copy(
+                searchQuery = query,
+                filteredAllCoins = filtered,
+                isNoResults = filtered.isEmpty() && !_uiState.value.isEmpty,
+            )
         }
     }
 

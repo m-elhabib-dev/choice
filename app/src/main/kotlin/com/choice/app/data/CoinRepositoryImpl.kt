@@ -10,6 +10,7 @@ import com.choice.app.domain.CoinSummary
 import com.choice.app.domain.CoinWithChoices
 import com.choice.app.domain.Choice
 import com.choice.app.domain.Decision
+import com.choice.app.domain.SharedCoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -127,6 +128,30 @@ class CoinRepositoryImpl(
                 )
             }
         }
+
+    override suspend fun importSharedCoin(payload: SharedCoin): Long {
+        val persistedCoinId = coinDao.insertCoin(
+            CoinEntity(
+                id = 0,
+                name = payload.name.trim(),
+                weightedEnabled = payload.weightedEnabled,
+                avoidLastResultEnabled = payload.avoidLastResultEnabled,
+            ),
+        )
+
+        coinDao.insertChoices(
+            payload.choices.mapIndexed { index, sharedChoice ->
+                ChoiceEntity(
+                    coinId = persistedCoinId,
+                    text = sharedChoice.text.trim(),
+                    position = index,
+                    weight = sharedChoice.weight,
+                )
+            },
+        )
+
+        return persistedCoinId
+    }
 }
 
 private fun CoinWithChoicesRelation.toDomain(): CoinWithChoices =

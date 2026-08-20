@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -111,6 +113,24 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(padding),
             ) {
+                item {
+                    OutlinedTextField(
+                        value = uiState.searchQuery,
+                        onValueChange = { viewModel.updateSearchQuery(it) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        placeholder = { Text("Search coins...") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = "Search",
+                            )
+                        },
+                        singleLine = true,
+                    )
+                }
+
                 if (uiState.quickCoins.isNotEmpty()) {
                     item {
                         Text(
@@ -153,20 +173,43 @@ fun MainScreen(
                     )
                 }
 
-                items(uiState.allCoins) { coin ->
-                    CoinCard(
-                        name = coin.name,
-                        choiceCount = coin.choiceCount,
-                        isFavorite = coin.isFavorite,
-                        onClick = {
-                            viewModel.openCoin(coin.id)
-                            onCoinClick(coin.id)
-                        },
-                        onEdit = { onEditCoin(coin.id) },
-                        onToggleFavorite = { viewModel.toggleFavorite(coin.id) },
-                        onDelete = { viewModel.requestDelete(coin.id) },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                    )
+                if (uiState.isNoResults) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = "No matching coins",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = "Try a different search term",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
+                    }
+                } else {
+                    items(uiState.filteredAllCoins) { coin ->
+                        CoinCard(
+                            name = coin.name,
+                            choiceCount = coin.choiceCount,
+                            isFavorite = coin.isFavorite,
+                            onClick = {
+                                viewModel.openCoin(coin.id)
+                                onCoinClick(coin.id)
+                            },
+                            onEdit = { onEditCoin(coin.id) },
+                            onToggleFavorite = { viewModel.toggleFavorite(coin.id) },
+                            onDelete = { viewModel.requestDelete(coin.id) },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        )
+                    }
                 }
             }
         }

@@ -332,24 +332,24 @@ entries with choice + timestamp; a never-flipped coin shows a clear empty state.
 
 ### Tests for User Story 6
 
-- [ ] T049 [P] [US6] Unit test for `observeDecisionHistory` returning newest-first decisions whose
+- [X] T049 [P] [US6] Unit test for `observeDecisionHistory` returning newest-first decisions whose
       `choiceTextSnapshot` remains intact after the referenced choice is edited/removed, in
       `app/src/test/kotlin/com/choice/app/data/CoinRepositoryImplHistoryTest.kt`
-- [ ] T050 [P] [US6] Compose UI test: `HistoryScreen` lists decisions newest-first with choice text
+- [X] T050 [P] [US6] Compose UI test: `HistoryScreen` lists decisions newest-first with choice text
       and timestamp, and shows a clear empty state with no decisions, in
       `app/src/androidTest/kotlin/com/choice/app/ui/history/HistoryScreenTest.kt`
 
 ### Implementation for User Story 6
 
-- [ ] T051 [US6] Add `observeDecisionHistory(coinId: Long): Flow<List<Decision>>` (newest first) to
+- [X] T051 [US6] Add `observeDecisionHistory(coinId: Long): Flow<List<Decision>>` (newest first) to
       `app/src/main/kotlin/com/choice/app/data/CoinRepository.kt`/
       `app/src/main/kotlin/com/choice/app/data/CoinRepositoryImpl.kt` on top of
       `CoinDao.observeDecisionsByCoinId` (depends on T008)
-- [ ] T052 [P] [US6] Create `HistoryUiState` + `HistoryViewModel` (decision list + empty-state flag)
+- [X] T052 [P] [US6] Create `HistoryUiState` + `HistoryViewModel` (decision list + empty-state flag)
       in `app/src/main/kotlin/com/choice/app/ui/history/HistoryViewModel.kt` (depends on T051)
-- [ ] T053 [P] [US6] Create `HistoryScreen` rendering decisions newest-first with an empty state, in
+- [X] T053 [P] [US6] Create `HistoryScreen` rendering decisions newest-first with an empty state, in
       `app/src/main/kotlin/com/choice/app/ui/history/HistoryScreen.kt`
-- [ ] T054 [US6] Register `HistoryViewModel` in `CoinViewModelFactory` and add a `"history/{coinId}"`
+- [X] T054 [US6] Register `HistoryViewModel` in `CoinViewModelFactory` and add a `"history/{coinId}"`
       route reachable from `CoinFlipScreen`, in
       `app/src/main/kotlin/com/choice/app/ui/ViewModelFactory.kt` and
       `app/src/main/kotlin/com/choice/app/MainActivity.kt` (depends on T052, T053)
@@ -369,26 +369,26 @@ empty state.
 
 ### Tests for User Story 7
 
-- [ ] T055 [P] [US7] Unit test for `computeStatistics` — counts, most/least frequent with
+- [X] T055 [P] [US7] Unit test for `computeStatistics` — counts, most/least frequent with
       position-based tie-break, and `totalDecisions == 0` empty-state output, in
       `app/src/test/kotlin/com/choice/app/domain/CoinStatisticsTest.kt`
-- [ ] T056 [P] [US7] Compose UI test: `StatisticsScreen` shows total/per-choice/most-least-frequent/
+- [X] T056 [P] [US7] Compose UI test: `StatisticsScreen` shows total/per-choice/most-least-frequent/
       most-recent matching a fixture history, and an empty state with no history, in
       `app/src/androidTest/kotlin/com/choice/app/ui/statistics/StatisticsScreenTest.kt`
 
 ### Implementation for User Story 7
 
-- [ ] T057 [P] [US7] Create `CoinStatistics`/`ChoiceCount` data classes and
+- [X] T057 [P] [US7] Create `CoinStatistics`/`ChoiceCount` data classes and
       `computeStatistics(choices: List<Choice>, decisions: List<Decision>): CoinStatistics` in
       `app/src/main/kotlin/com/choice/app/domain/CoinStatistics.kt` (per contracts/domain-api.md)
-- [ ] T058 [P] [US7] Create `StatisticsViewModel` combining `observeCoin` and
+- [X] T058 [P] [US7] Create `StatisticsViewModel` combining `observeCoin` and
       `observeDecisionHistory` through `computeStatistics(...)`, in
       `app/src/main/kotlin/com/choice/app/ui/statistics/StatisticsViewModel.kt` (depends on T057,
       T051)
-- [ ] T059 [P] [US7] Create `StatisticsScreen` rendering the total/per-choice breakdown/most-least-
+- [X] T059 [P] [US7] Create `StatisticsScreen` rendering the total/per-choice breakdown/most-least-
       frequent/most-recent with an empty state, in
       `app/src/main/kotlin/com/choice/app/ui/statistics/StatisticsScreen.kt`
-- [ ] T060 [US7] Register `StatisticsViewModel` in `CoinViewModelFactory` and add a
+- [X] T060 [US7] Register `StatisticsViewModel` in `CoinViewModelFactory` and add a
       `"statistics/{coinId}"` route reachable from `CoinFlipScreen`/`HistoryScreen`, in
       `app/src/main/kotlin/com/choice/app/ui/ViewModelFactory.kt` and
       `app/src/main/kotlin/com/choice/app/MainActivity.kt` (depends on T058, T059)
@@ -407,20 +407,20 @@ list returns; search for no match, verify a clear "no matches" state.
 
 ### Tests for User Story 8
 
-- [ ] T061 [P] [US8] Unit test for `matchesSearchQuery` — case-insensitive substring match, blank
+- [X] T061 [P] [US8] Unit test for `matchesSearchQuery` — case-insensitive substring match, blank
       query matches everything, in `app/src/test/kotlin/com/choice/app/domain/CoinSearchTest.kt`
-- [ ] T062 [P] [US8] Compose UI test: typing narrows the visible list live, clearing restores the
+- [X] T062 [P] [US8] Compose UI test: typing narrows the visible list live, clearing restores the
       full list, and a no-match query shows a clear "no matches" state, in
       `app/src/androidTest/kotlin/com/choice/app/ui/main/MainScreenSearchTest.kt`
 
 ### Implementation for User Story 8
 
-- [ ] T063 [P] [US8] Create `matchesSearchQuery(coinName: String, query: String): Boolean` in
+- [X] T063 [P] [US8] Create `matchesSearchQuery(coinName: String, query: String): Boolean` in
       `app/src/main/kotlin/com/choice/app/domain/CoinSearch.kt`
-- [ ] T064 [US8] Add a search-query state and a `matchesSearchQuery`-filtered coin list (plus a
+- [X] T064 [US8] Add a search-query state and a `matchesSearchQuery`-filtered coin list (plus a
       no-matches flag) to `MainViewModel`, in
       `app/src/main/kotlin/com/choice/app/ui/main/MainViewModel.kt` (depends on T063, T023)
-- [ ] T065 [US8] Add a search field and a "no matches" empty state to `MainScreen`, in
+- [X] T065 [US8] Add a search field and a "no matches" empty state to `MainScreen`, in
       `app/src/main/kotlin/com/choice/app/ui/main/MainScreen.kt` (depends on T064, T024)
 
 **Checkpoint**: User Stories 1–8 all work independently.
@@ -437,25 +437,25 @@ edit/add/remove/reorder its choices exactly like any other coin.
 
 ### Tests for User Story 9
 
-- [ ] T066 [P] [US9] Unit test verifying `CoinTemplates` provides Breakfast/Lunch/Workout/Movie with
+- [X] T066 [P] [US9] Unit test verifying `CoinTemplates` provides Breakfast/Lunch/Workout/Movie with
       the spec's example starter choices, in
       `app/src/test/kotlin/com/choice/app/domain/CoinTemplatesTest.kt`
-- [ ] T067 [P] [US9] Compose UI test: picking the "Breakfast" template pre-fills `CoinEditScreen`'s
+- [X] T067 [P] [US9] Compose UI test: picking the "Breakfast" template pre-fills `CoinEditScreen`'s
       name and choices, and the saved coin is subsequently editable like any other, in
       `app/src/androidTest/kotlin/com/choice/app/ui/templates/TemplatePickerScreenTest.kt`
 
 ### Implementation for User Story 9
 
-- [ ] T068 [P] [US9] Create the `CoinTemplate` data class and a `CoinTemplates` object listing
+- [X] T068 [P] [US9] Create the `CoinTemplate` data class and a `CoinTemplates` object listing
       Breakfast/Lunch/Workout/Movie with their starter choices, in
       `app/src/main/kotlin/com/choice/app/domain/CoinTemplates.kt` (research.md §8)
-- [ ] T069 [P] [US9] Create `TemplatePickerScreen` listing the four templates plus a "start blank"
+- [X] T069 [P] [US9] Create `TemplatePickerScreen` listing the four templates plus a "start blank"
       option, in `app/src/main/kotlin/com/choice/app/ui/templates/TemplatePickerScreen.kt` (depends
       on T068)
-- [ ] T070 [US9] Add an optional template pre-fill parameter to `CoinEditViewModel`'s blank-coin
+- [X] T070 [US9] Add an optional template pre-fill parameter to `CoinEditViewModel`'s blank-coin
       initialization path (pre-populating name + starter choices), in
       `app/src/main/kotlin/com/choice/app/ui/coinedit/CoinEditViewModel.kt` (depends on T068)
-- [ ] T071 [US9] Add a `"templates"` route in `MainActivity`, change `MainScreen`'s "create coin"
+- [X] T071 [US9] Add a `"templates"` route in `MainActivity`, change `MainScreen`'s "create coin"
       action to navigate there first, and pass the chosen template's name/choices as nav arguments
       into the `"coinedit"` route, in `app/src/main/kotlin/com/choice/app/MainActivity.kt` (depends
       on T069, T070)
@@ -476,40 +476,40 @@ malformed/unsupported-version payloads are rejected without crashing.
 
 ### Tests for User Story 10
 
-- [ ] T072 [P] [US10] Unit test for `encodeSharedCoin`/`decodeSharedCoin` — an exact round trip, and
+- [X] T072 [P] [US10] Unit test for `encodeSharedCoin`/`decodeSharedCoin` — an exact round trip, and
       rejection (via `InvalidSharePayloadException`) of malformed JSON, a missing required field, an
       unsupported `schemaVersion`, and a non-positive/non-whole weight, per
       contracts/share-payload-contract.md, in
       `app/src/test/kotlin/com/choice/app/domain/SharePayloadTest.kt`
-- [ ] T073 [P] [US10] Unit test for `CoinRepositoryImpl.importSharedCoin` always inserting a new,
+- [X] T073 [P] [US10] Unit test for `CoinRepositoryImpl.importSharedCoin` always inserting a new,
       independent coin — including when an existing coin already has the same name/choices — in
       `app/src/test/kotlin/com/choice/app/data/CoinRepositoryImplImportTest.kt`
-- [ ] T074 [P] [US10] Compose UI test: sharing a coin launches `ACTION_SEND` with the expected JSON
+- [X] T074 [P] [US10] Compose UI test: sharing a coin launches `ACTION_SEND` with the expected JSON
       payload; pasting a valid payload into the Import screen creates a new coin, and pasting an
       invalid one shows a clear rejection message without crashing, in
       `app/src/androidTest/kotlin/com/choice/app/ui/share/ImportCoinScreenTest.kt`
 
 ### Implementation for User Story 10
 
-- [ ] T075 [P] [US10] Create `SharedCoin`/`SharedChoice` data classes, `CURRENT_SHARE_SCHEMA_VERSION`,
+- [X] T075 [P] [US10] Create `SharedCoin`/`SharedChoice` data classes, `CURRENT_SHARE_SCHEMA_VERSION`,
       `encodeSharedCoin`/`decodeSharedCoin`, and `InvalidSharePayloadException` using `org.json`, per
       contracts/share-payload-contract.md's validation rules, in
       `app/src/main/kotlin/com/choice/app/domain/SharePayload.kt`
-- [ ] T076 [US10] Add `importSharedCoin(payload: SharedCoin): Long` to
+- [X] T076 [US10] Add `importSharedCoin(payload: SharedCoin): Long` to
       `app/src/main/kotlin/com/choice/app/data/CoinRepository.kt`/
       `app/src/main/kotlin/com/choice/app/data/CoinRepositoryImpl.kt`, always inserting a brand-new
       `Coin` (`isFavorite = false`) + `Choice` rows with no existing-coin lookup (depends on T075)
-- [ ] T077 [P] [US10] Create `ImportCoinViewModel` handling pasted/received text →
+- [X] T077 [P] [US10] Create `ImportCoinViewModel` handling pasted/received text →
       `decodeSharedCoin` → `importSharedCoin`, surfacing the decode error message on failure, in
       `app/src/main/kotlin/com/choice/app/ui/share/ImportCoinViewModel.kt` (depends on T075, T076)
-- [ ] T078 [P] [US10] Create `ImportCoinScreen` with a paste-text field, an import action, and error
+- [X] T078 [P] [US10] Create `ImportCoinScreen` with a paste-text field, an import action, and error
       display, in `app/src/main/kotlin/com/choice/app/ui/share/ImportCoinScreen.kt`
-- [ ] T079 [US10] Add a "Share" action to `CoinFlipScreen`/`CoinSettingsScreen` launching
+- [X] T079 [US10] Add a "Share" action to `CoinFlipScreen`/`CoinSettingsScreen` launching
       `Intent(ACTION_SEND).setType("text/plain")` with `EXTRA_TEXT = encodeSharedCoin(...)` via
       `Intent.createChooser`, in
       `app/src/main/kotlin/com/choice/app/ui/coinflip/CoinFlipScreen.kt` and
       `app/src/main/kotlin/com/choice/app/ui/coinsettings/CoinSettingsScreen.kt` (depends on T075)
-- [ ] T080 [US10] Add an `ACTION_SEND` (`text/plain`) intent-filter to `MainActivity` in
+- [X] T080 [US10] Add an `ACTION_SEND` (`text/plain`) intent-filter to `MainActivity` in
       `app/src/main/AndroidManifest.xml`, route any incoming `EXTRA_TEXT` to the Import screen,
       register `ImportCoinViewModel` in `CoinViewModelFactory`, and add an
       `"import?sharedText={sharedText}"` route, in
@@ -524,14 +524,14 @@ malformed/unsupported-version payloads are rejected without crashing.
 
 **Purpose**: Consistency and final validation across all ten stories
 
-- [ ] T081 [P] Review the new History/Statistics/Quick-Coins/Search empty states for a single shared
+- [X] T081 [P] Review the new History/Statistics/Quick-Coins/Search empty states for a single shared
       empty-state composable and consistent Catppuccin Mocha styling, extracting one into
       `app/src/main/kotlin/com/choice/app/ui/components/` if duplicated
-- [ ] T082 [P] Update `README.md` at the repo root to reflect the ten new capabilities, if its
+- [X] T082 [P] Update `README.md` at the repo root to reflect the ten new capabilities, if its
       feature list is user-facing documentation rather than only describing the `001` MVP
 - [ ] T083 Run all manual validation scenarios (1–10) from
       `specs/002-coin-decision-suite/quickstart.md` with the device/emulator in airplane mode
-- [ ] T084 Run `./gradlew test connectedAndroidTest` from the repo root and confirm every unit and
+- [X] T084 Run `./gradlew test connectedAndroidTest` from the repo root and confirm every unit and
       instrumented test passes, including the `Migration(1, 2)` test (FR-043, SC-005)
 
 ---

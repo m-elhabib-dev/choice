@@ -6,7 +6,16 @@ A simple Android app that helps you make decisions when you can't choose between
 
 - **Create Coins** - Build reusable decision contexts (e.g., "Breakfast") with 2+ choices
 - **Flip to Decide** - Randomly select one choice with an unbiased process
-- **Quick Access** - Frequently used coins appear at the top based on recency and frequency
+- **Accept or Override** - Primary "Accept" action commits the decision; a secondary "Flip again" lets you override
+- **Quick Coins** - Favorite coins for one-tap access, sorted by most recently used
+- **Reorder Choices** - Drag and drop to rearrange choice order within a coin
+- **Weighted Selection** - Assign per-choice weights so some options are more likely than others
+- **Avoid Last Result** - Exclude the previous result from the next flip for variety
+- **Decision History** - Browse a timestamped log of every accepted decision per coin
+- **Statistics** - View total decisions, most/least selected choices, and a per-choice breakdown
+- **Search** - Find coins instantly by name from the home screen
+- **Templates** - Start from bundled templates (Breakfast, Lunch, Workout, Movie) or begin blank
+- **Share & Import** - Export a coin as a JSON payload; paste it into another device to import
 - **Full Offline** - Works completely offline with local Room database persistence
 - **Modern UI** - Clean, minimal design using Catppuccin Mocha color palette
 
@@ -23,13 +32,19 @@ A simple Android app that helps you make decisions when you can't choose between
 
 ```
 app/src/main/kotlin/com/choice/app/
-├── data/           # Repository and Room database
-├── domain/         # Business logic (FlipCoin, QuickAccessScore)
-└── ui/             # Compose screens and ViewModels
-    ├── coinedit/   # Create/edit coin screen
-    ├── coinflip/   # Coin flip screen
-    ├── main/       # Main screen with Quick Access
-    └── theme/      # Catppuccin Mocha theme
+├── data/               # Repository and Room database
+├── domain/             # Business logic (FlipCoin, WeightedSelection, Statistics, Search, Templates, SharePayload)
+└── ui/                 # Compose screens and ViewModels
+    ├── coinflip/       # Coin flip screen
+    ├── coinedit/       # Create/edit coin screen
+    ├── coinsettings/   # Weighted & avoid-last-result settings
+    ├── history/        # Decision history screen
+    ├── statistics/     # Per-coin statistics screen
+    ├── templates/      # Template picker screen
+    ├── share/          # Import coin screen
+    ├── main/           # Main screen with Quick Coins and search
+    ├── components/     # Shared composables (EmptyState, etc.)
+    └── theme/          # Catppuccin Mocha theme
 ```
 
 ## Building
@@ -38,7 +53,7 @@ app/src/main/kotlin/com/choice/app/
 # Debug build
 ./gradlew assembleDebug
 
-# Run tests
+# Run unit tests
 ./gradlew test
 
 # Run instrumented tests

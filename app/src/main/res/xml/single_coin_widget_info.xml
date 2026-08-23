@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  AppWidgetProviderInfo for the Single Coin Widget, per
+  contracts/widget-provider-contract.md. No periodic refresh (updatePeriodMillis="0") — the widget
+  updates only on user interaction or a reactive app-side data change (research.md §3). Reuses the
+  app icon as its preview image (T018) rather than a bespoke drawable.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="40dp"
+    android:minHeight="40dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:configure="com.choice.app.widget.SingleCoinWidgetConfigActivity"
+    android:previewImage="@mipmap/ic_launcher"
+    android:description="@string/widget_single_coin_description" />

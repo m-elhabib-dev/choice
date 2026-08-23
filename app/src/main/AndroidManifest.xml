@@ -24,6 +24,48 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".widget.SingleCoinWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_single_coin_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/single_coin_widget_info" />
+        </receiver>
+
+        <activity
+            android:name=".widget.SingleCoinWidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Choice">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".widget.QuickCoinsWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_quick_coins_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quick_coins_widget_info" />
+        </receiver>
+
+        <activity
+            android:name=".widget.QuickCoinsWidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Choice">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

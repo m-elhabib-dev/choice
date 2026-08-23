@@ -23,6 +23,7 @@ import com.choice.app.ui.statistics.StatisticsScreen
 import com.choice.app.ui.templates.TemplatePickerScreen
 import com.choice.app.ui.share.ImportCoinScreen
 import com.choice.app.ui.theme.ChoiceTheme
+import com.choice.app.widget.OpenCoinInAppAction
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +35,9 @@ class MainActivity : ComponentActivity() {
                     initialPayload = intent?.takeIf {
                         it.action == android.content.Intent.ACTION_SEND
                     }?.getStringExtra(android.content.Intent.EXTRA_TEXT),
+                    openCoinId = intent?.takeIf {
+                        it.hasExtra(OpenCoinInAppAction.EXTRA_OPEN_COIN_ID)
+                    }?.getLongExtra(OpenCoinInAppAction.EXTRA_OPEN_COIN_ID, -1L),
                 )
             }
         }
@@ -41,7 +45,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun ChoiceNavHost(initialPayload: String? = null) {
+private fun ChoiceNavHost(initialPayload: String? = null, openCoinId: Long? = null) {
     val navController = rememberNavController()
     val context = LocalContext.current
     val appContainer = (context.applicationContext as ChoiceApplication).appContainer
@@ -50,6 +54,15 @@ private fun ChoiceNavHost(initialPayload: String? = null) {
         LaunchedEffect(Unit) {
             val encodedPayload = java.net.URLEncoder.encode(initialPayload, "UTF-8")
             navController.navigate("import?payload=$encodedPayload")
+        }
+    }
+
+    if (openCoinId != null) {
+        // Mirrors the ACTION_SEND import handling above: a widget's "open in app" action (per
+        // contracts/widget-action-contract.md) hands MainActivity a coinId to deep-link straight
+        // to, instead of the default "main" coin list start destination.
+        LaunchedEffect(Unit) {
+            navController.navigate("coinflip/$openCoinId")
         }
     }
 

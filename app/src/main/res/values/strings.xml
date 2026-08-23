@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Choice</string>
+
+    <!-- Widgets -->
+    <string name="widget_single_coin_label">Single Coin</string>
+    <string name="widget_single_coin_description">Flip one of your saved coins right from the home screen.</string>
+    <string name="widget_quick_coins_label">Quick Coins</string>
+    <string name="widget_quick_coins_description">Flip several favorited coins right from the home screen.</string>
+
+    <string name="widget_state_ready">Ready to flip</string>
+    <string name="widget_state_unavailable">Widget unavailable</string>
+    <string name="widget_state_no_coins_selected">No coins selected</string>
+    <string name="widget_state_too_few_choices">Can\'t decide yet — add another choice</string>
+    <string name="widget_state_no_coins_at_all">Create a coin in the app first</string>
+    <string name="widget_action_flip">Flip</string>
+    <string name="widget_action_reconfigure">Reconfigure</string>
+    <string name="widget_action_open_app">Open app</string>
+    <string name="widget_action_create_coin">Create coin</string>
 </resources>

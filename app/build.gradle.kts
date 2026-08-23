@@ -78,6 +78,9 @@ dependencies {
     // Core KTX
     implementation("androidx.core:core-ktx:1.15.0")
 
+    // Glance (App Widgets)
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")

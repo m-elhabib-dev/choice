@@ -1,6 +1,7 @@
 package com.choice.app.widget
 
 import android.content.Context
+import androidx.glance.appwidget.updateAll
 import com.choice.app.data.CoinRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -112,47 +112,47 @@ with no app launch.
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Unit test `WidgetConfigStoreTest` in
+- [X] T010 [P] [US1] Unit test `WidgetConfigStoreTest` in
       `app/src/test/kotlin/com/choice/app/widget/WidgetConfigStoreTest.kt`: covers writing/reading
       a `SingleCoinWidgetConfig(coinId)`, reading an unset/never-written config, and reading a
       corrupted/undecodable value — asserting each maps to "no config" rather than throwing.
-- [ ] T011 [P] [US1] Unit test `WidgetFlipGuardTest` in
+- [X] T011 [P] [US1] Unit test `WidgetFlipGuardTest` in
       `app/src/test/kotlin/com/choice/app/widget/WidgetFlipGuardTest.kt`: launches two concurrent
       `tryFlip` calls on the same key and asserts exactly one runs its block to completion (the
       other is dropped), per the rapid-tap edge case and research.md §6.
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Create `app/src/main/res/xml/single_coin_widget_info.xml`
+- [X] T012 [US1] Create `app/src/main/res/xml/single_coin_widget_info.xml`
       (`AppWidgetProviderInfo`) per contracts/widget-provider-contract.md: 1-cell min size, 2x1
       target cell size, `resizeMode="horizontal|vertical"`, `widgetCategory="home_screen"`,
       `updatePeriodMillis="0"`, `configure="com.choice.app.widget.SingleCoinWidgetConfigActivity"`,
       referencing the `widget_single_coin_label`/`widget_single_coin_description` strings from T003.
-- [ ] T013 [US1] Create `app/src/main/kotlin/com/choice/app/widget/SingleCoinWidget.kt`: a
+- [X] T013 [US1] Create `app/src/main/kotlin/com/choice/app/widget/SingleCoinWidget.kt`: a
       `GlanceAppWidget` that resolves its `SingleCoinWidgetConfig` (T005) against
       `CoinRepository.observeCoin(coinId)`, renders the derived state from data-model.md's "Derived
       render states" table (Unavailable / Too Few Choices / Ready / Result), shows the coin name as
       a tap target wired to `OpenCoinInAppAction` (T008), and shows a primary flip control (Ready)
       or a settled result plus visually secondary flip control (Result) per FR-008/FR-009. Uses
       `WidgetGlanceTheme` (T004) for styling.
-- [ ] T014 [US1] Create `app/src/main/kotlin/com/choice/app/widget/SingleCoinWidgetReceiver.kt`
+- [X] T014 [US1] Create `app/src/main/kotlin/com/choice/app/widget/SingleCoinWidgetReceiver.kt`
       (`GlanceAppWidgetReceiver`) exposing `SingleCoinWidget()` as its `glanceAppWidget`.
-- [ ] T015 [US1] Create `app/src/main/kotlin/com/choice/app/widget/SingleCoinWidgetConfigActivity.kt`
+- [X] T015 [US1] Create `app/src/main/kotlin/com/choice/app/widget/SingleCoinWidgetConfigActivity.kt`
       implementing the system-initiated configuration handshake from
       contracts/widget-configuration-contract.md §1: read `EXTRA_APPWIDGET_ID`
       (finish immediately if missing), default `setResult(RESULT_CANCELED)`, show the "no coins yet"
       state with an open-app action when `observeCoins()` is empty (FR-013), otherwise render a coin
       picker; on selection, write `SingleCoinWidgetConfig(coinId)` via `WidgetConfigStore` (T005),
       call `setResult(RESULT_OK, ...)`, and `finish()`.
-- [ ] T016 [US1] Implement `FlipSingleCoinAction : ActionCallback` in `WidgetActions.kt` per
+- [X] T016 [US1] Implement `FlipSingleCoinAction : ActionCallback` in `WidgetActions.kt` per
       contracts/widget-action-contract.md: guarded by `WidgetFlipGuard` (T006) keyed on `glanceId`;
       resolves config + `CoinWithChoices`; on unavailable/too-few-choices just triggers a re-render;
       otherwise calls `selectChoice(...)`, `CoinRepository.recordDecision(...)`,
       `recordInteraction(...)`, then `SingleCoinWidget().update(context, glanceId)`.
-- [ ] T017 [US1] Add the `<receiver>` for `SingleCoinWidgetReceiver` and the `<activity>` for
+- [X] T017 [US1] Add the `<receiver>` for `SingleCoinWidgetReceiver` and the `<activity>` for
       `SingleCoinWidgetConfigActivity` to `app/src/main/AndroidManifest.xml` exactly as specified in
       contracts/widget-provider-contract.md's "AndroidManifest.xml additions" section.
-- [ ] T018 [US1] Add a simple `res/drawable` preview image (or reuse the existing app icon) and
+- [X] T018 [US1] Add a simple `res/drawable` preview image (or reuse the existing app icon) and
       reference it via `android:previewImage` in `single_coin_widget_info.xml` (T012).
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently —
@@ -171,7 +171,7 @@ coins with a flip action each, and confirm tapping one coin's flip only affects 
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Unit test `QuickCoinsDefaultSelectionTest` in
+- [X] T019 [P] [US2] Unit test `QuickCoinsDefaultSelectionTest` in
       `app/src/test/kotlin/com/choice/app/widget/QuickCoinsDefaultSelectionTest.kt`: covers
       `useFavorites = true` resolving against `observeQuickCoins()`, `useFavorites = false`
       resolving `explicitCoinIds` against `observeCoins()` with stale/deleted IDs dropped (not shown
@@ -179,13 +179,13 @@ coins with a flip action each, and confirm tapping one coin's flip only affects 
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Create `app/src/main/res/xml/quick_coins_widget_info.xml`
+- [X] T020 [US2] Create `app/src/main/res/xml/quick_coins_widget_info.xml`
       (`AppWidgetProviderInfo`) per contracts/widget-provider-contract.md: ~2x2 cell min size, 3x2
       target cell size, `resizeMode="horizontal|vertical"`, `widgetCategory="home_screen"`,
       `updatePeriodMillis="0"`,
       `configure="com.choice.app.widget.QuickCoinsWidgetConfigActivity"`, referencing the
       `widget_quick_coins_label`/`widget_quick_coins_description` strings from T003.
-- [ ] T021 [US2] Create `app/src/main/kotlin/com/choice/app/widget/QuickCoinsWidget.kt`: a
+- [X] T021 [US2] Create `app/src/main/kotlin/com/choice/app/widget/QuickCoinsWidget.kt`: a
       `GlanceAppWidget` that resolves its `QuickCoinsWidgetConfig` (T005) — favorites via
       `observeQuickCoins()` or explicit IDs via `observeCoins()` filtering per data-model.md — and
       renders a per-coin row (name tappable via `OpenCoinInAppAction`, flip control wired to
@@ -193,9 +193,9 @@ coins with a flip action each, and confirm tapping one coin's flip only affects 
       `LocalSize` (Glance's size-aware composition) so it shows as many coins as fit without
       clipping/overlap. Renders the "No Coins Selected" state (data-model.md) when the resolved set
       is empty.
-- [ ] T022 [US2] Create `app/src/main/kotlin/com/choice/app/widget/QuickCoinsWidgetReceiver.kt`
+- [X] T022 [US2] Create `app/src/main/kotlin/com/choice/app/widget/QuickCoinsWidgetReceiver.kt`
       (`GlanceAppWidgetReceiver`) exposing `QuickCoinsWidget()` as its `glanceAppWidget`.
-- [ ] T023 [US2] Create
+- [X] T023 [US2] Create
       `app/src/main/kotlin/com/choice/app/widget/QuickCoinsWidgetConfigActivity.kt` implementing the
       configuration handshake from contracts/widget-configuration-contract.md §1: same
       `EXTRA_APPWIDGET_ID`/`RESULT_CANCELED` default and "no coins yet" (FR-013) handling as T015;
@@ -204,16 +204,16 @@ coins with a flip action each, and confirm tapping one coin's flip only affects 
       toggle off with an explicit subset writes
       `QuickCoinsWidgetConfig(useFavorites = false, explicitCoinIds = selection)` via
       `WidgetConfigStore` (T005); `setResult(RESULT_OK, ...)` and `finish()`.
-- [ ] T024 [US2] Implement `FlipQuickCoinAction : ActionCallback` in `WidgetActions.kt` per
+- [X] T024 [US2] Implement `FlipQuickCoinAction : ActionCallback` in `WidgetActions.kt` per
       contracts/widget-action-contract.md: takes a `coinId: Long` `ActionParameters.Key`, guarded by
       `WidgetFlipGuard` (T006) keyed on `(glanceId, coinId)` so different coins in the same instance
       can flip concurrently while the same coin cannot double-fire; same
       resolve/select/record/re-render logic as `FlipSingleCoinAction`, updating only via
       `QuickCoinsWidget().update(context, glanceId)`.
-- [ ] T025 [US2] Add the `<receiver>` for `QuickCoinsWidgetReceiver` and the `<activity>` for
+- [X] T025 [US2] Add the `<receiver>` for `QuickCoinsWidgetReceiver` and the `<activity>` for
       `QuickCoinsWidgetConfigActivity` to `app/src/main/AndroidManifest.xml` per
       contracts/widget-provider-contract.md.
-- [ ] T026 [P] [US2] Add a `res/drawable` preview image (or reuse the app icon) and reference it via
+- [X] T026 [P] [US2] Add a `res/drawable` preview image (or reuse the app icon) and reference it via
       `android:previewImage` in `quick_coins_widget_info.xml` (T020).
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently — Single Coin

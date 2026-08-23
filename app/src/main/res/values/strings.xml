@@ -16,4 +16,8 @@
     <string name="widget_action_reconfigure">Reconfigure</string>
     <string name="widget_action_open_app">Open app</string>
     <string name="widget_action_create_coin">Create coin</string>
+    <string name="widget_config_choose_coin_title">Choose a coin</string>
+    <string name="widget_config_use_favorites_title">Use my favorites</string>
+    <string name="widget_config_use_favorites_description">Auto-updating — always shows your current favorited coins</string>
+    <string name="widget_config_confirm_selection">Save</string>
 </resources>

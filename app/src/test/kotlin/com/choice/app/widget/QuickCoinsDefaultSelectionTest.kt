@@ -88,4 +88,36 @@ class QuickCoinsDefaultSelectionTest {
 
         assertTrue(result.isEmpty())
     }
+
+    // --- US4 (app-sync): the resolved set is recomputed from live data on every call, so it
+    // tracks favorite/delete changes made in-app without the widget being removed/re-added. ---
+
+    @Test
+    fun useFavorites_resolvedSetChangesWhenFavoritesSetChanges() {
+        val config = QuickCoinsWidgetConfig(useFavorites = true)
+        val beforeFavorites = listOf(coinWithChoices(1L, "Lunch", isFavorite = true))
+        val afterFavoriting = listOf(
+            coinWithChoices(1L, "Lunch", isFavorite = true),
+            coinWithChoices(2L, "Movie", isFavorite = true),
+        )
+
+        val before = resolveQuickCoinsCoins(config, favorites = beforeFavorites, allCoins = beforeFavorites)
+        val after = resolveQuickCoinsCoins(config, favorites = afterFavoriting, allCoins = afterFavoriting)
+
+        assertEquals(listOf(1L), before.map { it.coin.id })
+        assertEquals(listOf(1L, 2L), after.map { it.coin.id })
+    }
+
+    @Test
+    fun explicitCoinIds_deletedCoin_isDroppedFromResolvedSetOnNextResolve() {
+        val config = QuickCoinsWidgetConfig(useFavorites = false, explicitCoinIds = listOf(1L, 2L))
+        val beforeDelete = listOf(coinWithChoices(1L, "Lunch"), coinWithChoices(2L, "Movie"))
+        val afterDelete = listOf(coinWithChoices(1L, "Lunch")) // coin 2L deleted in-app
+
+        val before = resolveQuickCoinsCoins(config, favorites = emptyList(), allCoins = beforeDelete)
+        val after = resolveQuickCoinsCoins(config, favorites = emptyList(), allCoins = afterDelete)
+
+        assertEquals(listOf(1L, 2L), before.map { it.coin.id })
+        assertEquals(listOf(1L), after.map { it.coin.id })
+    }
 }

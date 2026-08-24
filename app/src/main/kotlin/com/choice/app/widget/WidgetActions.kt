@@ -9,8 +9,32 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.action.ActionCallback
 import com.choice.app.ChoiceApplication
 import com.choice.app.MainActivity
+import com.choice.app.domain.Choice
+import com.choice.app.domain.CoinWithChoices
 import com.choice.app.domain.selectChoice
+import kotlin.random.Random
 import kotlinx.coroutines.flow.firstOrNull
+
+/**
+ * The single point where a widget flip resolves its next [Choice], per User Story 3 ("widget
+ * decisions follow each coin's configured rules"): delegates straight to the domain [selectChoice]
+ * with the coin's live `weightedEnabled`/`avoidLastResultEnabled` flags and [lastChoiceId] — no
+ * widget-local selection logic. Both [FlipSingleCoinAction] and [FlipQuickCoinAction] call this
+ * (rather than [selectChoice] separately) so the two call sites can never drift apart. `internal`
+ * so `WidgetDecisionParityTest` can exercise it directly with a plain [CoinWithChoices], without
+ * needing a real Android `Context`/`GlanceId`.
+ */
+internal fun resolveFlipChoice(
+    coinWithChoices: CoinWithChoices,
+    lastChoiceId: Long?,
+    random: Random = Random.Default,
+): Choice = selectChoice(
+    choices = coinWithChoices.choices,
+    weightedEnabled = coinWithChoices.coin.weightedEnabled,
+    avoidLastResultEnabled = coinWithChoices.coin.avoidLastResultEnabled,
+    lastChoiceId = lastChoiceId,
+    random = random,
+)
 
 /**
  * Opens the app directly to a coin, per contracts/widget-action-contract.md's
@@ -54,9 +78,10 @@ class OpenCoinInAppAction : ActionCallback {
  * Resolves the instance's configured coin against the live [com.choice.app.data.CoinRepository];
  * an unresolvable coin or one with fewer than 2 choices just re-renders the widget (so it shows/
  * confirms its Unavailable or Too Few Choices state) with no selection attempted. Otherwise it
- * calls the same [selectChoice] the app itself uses (User Story 3 parity) and records the result
- * through [com.choice.app.data.CoinRepository.recordDecision]/`recordInteraction`, exactly as
- * [com.choice.app.ui.coinflip.CoinFlipViewModel] does today — no widget-local selection logic.
+ * calls [resolveFlipChoice] (User Story 3 parity — the same [selectChoice] the app itself uses) and
+ * records the result through [com.choice.app.data.CoinRepository.recordDecision]/
+ * `recordInteraction`, exactly as [com.choice.app.ui.coinflip.CoinFlipViewModel] does today — no
+ * widget-local selection logic.
  */
 class FlipSingleCoinAction : ActionCallback {
 
@@ -74,12 +99,7 @@ class FlipSingleCoinAction : ActionCallback {
 
             if (coinId != null && coinWithChoices != null && coinWithChoices.choices.size >= 2) {
                 val lastDecision = coinRepository.getLastDecision(coinId)
-                val choice = selectChoice(
-                    choices = coinWithChoices.choices,
-                    weightedEnabled = coinWithChoices.coin.weightedEnabled,
-                    avoidLastResultEnabled = coinWithChoices.coin.avoidLastResultEnabled,
-                    lastChoiceId = lastDecision?.choiceId,
-                )
+                val choice = resolveFlipChoice(coinWithChoices, lastDecision?.choiceId)
                 coinRepository.recordDecision(coinId, choice.id, choice.text)
                 coinRepository.recordInteraction(coinId)
             }
@@ -141,12 +161,7 @@ class FlipQuickCoinAction : ActionCallback {
 
             if (coinWithChoices != null && coinWithChoices.choices.size >= 2) {
                 val lastDecision = coinRepository.getLastDecision(coinId)
-                val choice = selectChoice(
-                    choices = coinWithChoices.choices,
-                    weightedEnabled = coinWithChoices.coin.weightedEnabled,
-                    avoidLastResultEnabled = coinWithChoices.coin.avoidLastResultEnabled,
-                    lastChoiceId = lastDecision?.choiceId,
-                )
+                val choice = resolveFlipChoice(coinWithChoices, lastDecision?.choiceId)
                 coinRepository.recordDecision(coinId, choice.id, choice.text)
                 coinRepository.recordInteraction(coinId)
             }

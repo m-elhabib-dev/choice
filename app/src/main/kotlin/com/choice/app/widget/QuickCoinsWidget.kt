@@ -163,7 +163,13 @@ private fun QuickCoinsWidgetContent(state: QuickCoinsWidgetState) {
     }
 }
 
-/** Resolved coin set (favorites or explicit) is empty — a Quick Coins Widget analogue of FR-002. */
+/**
+ * Resolved coin set (favorites or explicit) is empty — a Quick Coins Widget analogue of FR-002.
+ * Per data-model.md's "Derived render states" table, this state offers both a "pick coins"
+ * (reconfigure) action and an "open app" fallback — the widget-level analogue of
+ * [SingleCoinWidgetState.Unavailable]'s pair of actions (US5 AS3), so tapping through from a Quick
+ * Coins Widget with nothing resolved still reaches the app instead of a dead end.
+ */
 @Composable
 private fun NoCoinsSelectedContent() {
     val context = LocalContext.current
@@ -181,6 +187,13 @@ private fun NoCoinsSelectedContent() {
             text = context.getString(R.string.widget_action_reconfigure),
             style = TextStyle(color = WidgetGlanceTheme.accent, fontWeight = FontWeight.Bold),
             modifier = GlanceModifier.clickable(actionRunCallback<ReconfigureQuickCoinsAction>()),
+        )
+        Spacer(modifier = GlanceModifier.height(4.dp))
+        Text(
+            text = context.getString(R.string.widget_action_open_app),
+            style = TextStyle(color = WidgetGlanceTheme.textSecondary),
+            // No coinId parameter: OpenCoinInAppAction falls back to the app's main coin list.
+            modifier = GlanceModifier.clickable(actionRunCallback<OpenCoinInAppAction>()),
         )
     }
 }

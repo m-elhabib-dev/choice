@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -48,6 +49,15 @@ fun CoinFlipScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    // Per contracts/widget-action-contract.md: a coinId that no longer resolves (e.g. deleted
+    // between a widget's render and the tap that deep-linked here, US5 AS3) falls back to a
+    // reasonable existing screen — the main coin list — rather than a new "not found" UI.
+    LaunchedEffect(uiState.notFound) {
+        if (uiState.notFound) {
+            onBack()
+        }
+    }
 
     Scaffold(
         topBar = {

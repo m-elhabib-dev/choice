@@ -24,6 +24,7 @@ data class CoinFlipUiState(
     val canRemoveChoice: Boolean = true,
     val weightedEnabled: Boolean = false,
     val avoidLastResultEnabled: Boolean = false,
+    val notFound: Boolean = false,
 )
 
 class CoinFlipViewModel(
@@ -55,6 +56,14 @@ class CoinFlipViewModel(
                         avoidLastResultEnabled = coinWithChoices.coin.avoidLastResultEnabled,
                     )
                 }
+            } else {
+                // Per contracts/widget-action-contract.md's OpenCoinInAppAction: a coinId can
+                // arrive here from a widget's deep link for a coin that was deleted between the
+                // widget's last render and this tap (US5 AS3). No coinId ever resolved in-app
+                // before this feature (navigation only ever came from an existing coin's own row),
+                // so no not-found handling existed yet; `notFound` lets the screen fall back
+                // (pop back to the coin list) instead of rendering a blank/inert flip screen.
+                _uiState.update { it.copy(notFound = true) }
             }
         }
     }

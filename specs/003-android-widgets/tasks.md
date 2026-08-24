@@ -239,7 +239,7 @@ regression test that pins that reuse down.
 
 ### Tests for User Story 3
 
-- [ ] T027 [US3] Add a unit test to
+- [X] T027 [US3] Add a unit test to
       `app/src/test/kotlin/com/choice/app/widget/WidgetFlipGuardTest.kt` (or a new
       `WidgetDecisionParityTest.kt` in the same directory) asserting that the widget flip path calls
       `selectChoice` with the coin's current `weightedEnabled`/`avoidLastResultEnabled` values and
@@ -262,16 +262,16 @@ change, confirm the widget updates or shows a clear Unavailable state.
 
 ### Implementation for User Story 4
 
-- [ ] T028 [US4] Wire `WidgetRefreshCoordinator` (T007) into `ChoiceApplication.onCreate` if not
+- [X] T028 [US4] Wire `WidgetRefreshCoordinator` (T007) into `ChoiceApplication.onCreate` if not
       already fully wired by T007 (verify the coordinator's `CoroutineScope` is started exactly
       once and stays alive for the process lifetime) — this task is the integration checkpoint that
       makes rename/edit/favorite/delete reflect on all widgets per FR-011/FR-012/SC-005/SC-006,
       since `SingleCoinWidget`/`QuickCoinsWidget` (T013/T021) now exist for `updateAll()` to target.
-- [ ] T029 [US4] In `SingleCoinWidget.kt` (T013), confirm/adjust the Too-Few-Choices render path so
+- [X] T029 [US4] In `SingleCoinWidget.kt` (T013), confirm/adjust the Too-Few-Choices render path so
       that a coin whose choices drop to 0 or 1 (edited down in-app) renders the "can't decide yet"
       state (data-model.md, edge case) rather than attempting a flip — add the corresponding branch
       if not already covered by T013's state derivation.
-- [ ] T030 [P] [US4] Add a unit test in `app/src/test/kotlin/com/choice/app/widget/` (e.g.
+- [X] T030 [P] [US4] Add a unit test in `app/src/test/kotlin/com/choice/app/widget/` (e.g.
       `QuickCoinsDefaultSelectionTest.kt`, extending T019) covering: a favorites-mode Quick Coins
       Widget's resolved set changes when the underlying `observeQuickCoins()` favorites set changes
       (US4 AS4), and an explicit-mode widget silently drops (not errors on) an ID that no longer
@@ -293,12 +293,12 @@ to the main list, not a failure.
 
 ### Implementation for User Story 5
 
-- [ ] T031 [US5] Verify/finish `OpenCoinInAppAction` (T008) is wired as the tap target on: the coin
+- [X] T031 [US5] Verify/finish `OpenCoinInAppAction` (T008) is wired as the tap target on: the coin
       name/header in `SingleCoinWidget.kt`'s Ready/Result states (with `coinId` from its config),
       every row's name in `QuickCoinsWidget.kt` (with that row's own `coinId`), and the "open app"
       affordance shown in both widgets' Unavailable state (with `coinId = null`, i.e. fallback to
       `main`).
-- [ ] T032 [US5] Confirm `MainActivity`'s `coinflip/{coinId}` route (T009's navigation target)
+- [X] T032 [US5] Confirm `MainActivity`'s `coinflip/{coinId}` route (T009's navigation target)
       handles a `coinId` that no longer resolves (deleted between widget render and tap) via its
       existing not-found handling in
       `app/src/main/kotlin/com/choice/app/ui/coinflip/CoinFlipScreen.kt` / its ViewModel, per

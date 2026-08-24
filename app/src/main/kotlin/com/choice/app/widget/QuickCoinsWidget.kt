@@ -25,6 +25,8 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import androidx.glance.semantics.contentDescription
+import androidx.glance.semantics.semantics
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
@@ -186,14 +188,18 @@ private fun NoCoinsSelectedContent() {
         Text(
             text = context.getString(R.string.widget_action_reconfigure),
             style = TextStyle(color = WidgetGlanceTheme.accent, fontWeight = FontWeight.Bold),
-            modifier = GlanceModifier.clickable(actionRunCallback<ReconfigureQuickCoinsAction>()),
+            modifier = GlanceModifier
+                .clickable(actionRunCallback<ReconfigureQuickCoinsAction>())
+                .semantics { contentDescription = context.getString(R.string.widget_action_reconfigure) },
         )
         Spacer(modifier = GlanceModifier.height(4.dp))
         Text(
             text = context.getString(R.string.widget_action_open_app),
             style = TextStyle(color = WidgetGlanceTheme.textSecondary),
             // No coinId parameter: OpenCoinInAppAction falls back to the app's main coin list.
-            modifier = GlanceModifier.clickable(actionRunCallback<OpenCoinInAppAction>()),
+            modifier = GlanceModifier
+                .clickable(actionRunCallback<OpenCoinInAppAction>())
+                .semantics { contentDescription = context.getString(R.string.widget_action_open_app) },
         )
     }
 }
@@ -237,6 +243,9 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                     fontSize = 14.sp,
                 ),
                 maxLines = 1,
+                modifier = GlanceModifier.semantics {
+                    contentDescription = "$coinName, ${context.getString(R.string.widget_action_open_app)}"
+                },
             )
             when (row) {
                 is QuickCoinRowState.TooFewChoices -> Text(
@@ -247,16 +256,26 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                         textAlign = TextAlign.Start,
                     ),
                     maxLines = 1,
+                    modifier = GlanceModifier.semantics {
+                        contentDescription =
+                            "$coinName: ${context.getString(R.string.widget_state_too_few_choices)}"
+                    },
                 )
                 is QuickCoinRowState.Ready -> Text(
                     text = context.getString(R.string.widget_state_ready),
                     style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 11.sp),
                     maxLines = 1,
+                    modifier = GlanceModifier.semantics {
+                        contentDescription = "$coinName: ${context.getString(R.string.widget_state_ready)}"
+                    },
                 )
                 is QuickCoinRowState.Result -> Text(
                     text = row.resultText,
                     style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 11.sp),
                     maxLines = 1,
+                    modifier = GlanceModifier.semantics {
+                        contentDescription = "$coinName result: ${row.resultText}"
+                    },
                 )
             }
         }
@@ -278,7 +297,10 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                         actionRunCallback<FlipQuickCoinAction>(
                             actionParametersOf(FlipQuickCoinAction.ParamCoinId to coinId),
                         ),
-                    ),
+                    )
+                    .semantics {
+                        contentDescription = "${context.getString(R.string.widget_action_flip)} $coinName"
+                    },
             )
         }
     }

@@ -50,4 +50,41 @@ class WidgetConfigStoreTest {
 
         assertNull(WidgetConfigStore.decodeSingleCoinConfig(prefs))
     }
+
+    /**
+     * T033 (US6): each widget instance's config lives in its own `Preferences` blob, keyed by its
+     * own `GlanceId` at the real `getAppWidgetState`/`updateAppWidgetState` layer — this test pins
+     * that per-instance isolation at the pure decode/apply layer by modeling two instances as two
+     * independent in-memory `Preferences` and asserting a write to one never leaks into the other,
+     * regardless of write order.
+     */
+    @Test
+    fun twoInstances_eachKeepsItsOwnCoinIdIndependently() {
+        val instanceAPrefs = mutablePreferencesOf()
+        val instanceBPrefs = mutablePreferencesOf()
+
+        WidgetConfigStore.applySingleCoinConfig(instanceAPrefs, SingleCoinWidgetConfig(coinId = 1L))
+        WidgetConfigStore.applySingleCoinConfig(instanceBPrefs, SingleCoinWidgetConfig(coinId = 2L))
+
+        assertEquals(
+            SingleCoinWidgetConfig(coinId = 1L),
+            WidgetConfigStore.decodeSingleCoinConfig(instanceAPrefs),
+        )
+        assertEquals(
+            SingleCoinWidgetConfig(coinId = 2L),
+            WidgetConfigStore.decodeSingleCoinConfig(instanceBPrefs),
+        )
+
+        // Reconfiguring instance A must not affect instance B's already-read value.
+        WidgetConfigStore.applySingleCoinConfig(instanceAPrefs, SingleCoinWidgetConfig(coinId = 99L))
+
+        assertEquals(
+            SingleCoinWidgetConfig(coinId = 99L),
+            WidgetConfigStore.decodeSingleCoinConfig(instanceAPrefs),
+        )
+        assertEquals(
+            SingleCoinWidgetConfig(coinId = 2L),
+            WidgetConfigStore.decodeSingleCoinConfig(instanceBPrefs),
+        )
+    }
 }

@@ -325,7 +325,7 @@ the test that confirms that structural independence holds, rather than new produ
 
 ### Tests for User Story 6
 
-- [ ] T033 [US6] Add a unit test in
+- [X] T033 [US6] Add a unit test in
       `app/src/test/kotlin/com/choice/app/widget/WidgetConfigStoreTest.kt` (extending T010) that
       writes two distinct `SingleCoinWidgetConfig`s under two different `GlanceId`s and asserts
       reading each back returns its own `coinId`, unaffected by writes to the other — pinning the
@@ -340,11 +340,11 @@ criteria.
 
 **Purpose**: Accessibility, offline validation, and final manual acceptance across all stories.
 
-- [ ] T034 [P] Add Glance `contentDescription`/semantics text (via `GlanceModifier.semantics` or the
+- [X] T034 [P] Add Glance `contentDescription`/semantics text (via `GlanceModifier.semantics` or the
       equivalent Glance accessibility API) to every widget element in `SingleCoinWidget.kt` (T013)
       and `QuickCoinsWidget.kt` (T021): coin name, current result/state text, and each control
       (flip, reconfigure, open-app) per FR-020/SC-009.
-- [ ] T035 Run `./gradlew :app:testDebugUnitTest` and confirm all new widget tests (T010, T011,
+- [X] T035 Run `./gradlew :app:testDebugUnitTest` and confirm all new widget tests (T010, T011,
       T019, T027, T030, T033) and all existing tests pass.
 - [ ] T036 Execute `quickstart.md` Scenarios 1–6 plus the Offline check, Accessibility check, and
       Rapid-tap check manually on a device/emulator per its instructions, and record results.

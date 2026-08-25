@@ -23,8 +23,13 @@ import com.choice.app.ui.history.HistoryScreen
 import com.choice.app.ui.history.HistoryViewModel
 import com.choice.app.ui.main.MainScreen
 import com.choice.app.ui.main.MainViewModel
+import com.choice.app.ui.settings.SettingsScreen
+import com.choice.app.ui.settings.SettingsViewModel
 import com.choice.app.ui.statistics.StatisticsScreen
 import com.choice.app.ui.statistics.StatisticsViewModel
+import com.choice.app.ui.theme.AppThemeState
+import com.choice.app.ui.theme.SharedPreferencesThemeStore
+import com.choice.app.ui.theme.resolveThemeFlavor
 import java.util.Locale
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -153,6 +158,24 @@ class RtlLayoutTest {
                 onSettings = {},
                 onHistory = {},
             )
+        }
+        assertEquals(LayoutDirection.Rtl, direction)
+    }
+
+    /** SC-008: the "Appearance" section added by 005 must mirror correctly, same as every other row here. */
+    @Test
+    fun settingsScreen_appearanceSection_resolvesRtlUnderArabic() {
+        val activity = composeTestRule.activity
+        val themeStore = SharedPreferencesThemeStore(activity)
+        val themeState = AppThemeState(resolveThemeFlavor(themeStore.read()))
+        val viewModel = SettingsViewModel(
+            context = activity,
+            languagePreferenceStore = SharedPreferencesLanguageStore(activity),
+            themePreferenceStore = themeStore,
+            themeState = themeState,
+        )
+        val direction = renderNarrowAndCaptureDirection {
+            SettingsScreen(viewModel = viewModel, onBack = {})
         }
         assertEquals(LayoutDirection.Rtl, direction)
     }

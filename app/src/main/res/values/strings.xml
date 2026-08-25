@@ -103,6 +103,15 @@
     <string name="settings_language_system">System default</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_arabic">العربية</string>
+    <string name="settings_appearance_label">Appearance</string>
+    <string name="theme_latte_name">Latte</string>
+    <string name="theme_latte_description">Light Catppuccin</string>
+    <string name="theme_frappe_name">Frappé</string>
+    <string name="theme_frappe_description">Dark Catppuccin</string>
+    <string name="theme_macchiato_name">Macchiato</string>
+    <string name="theme_macchiato_description">Dark Catppuccin</string>
+    <string name="theme_mocha_name">Mocha</string>
+    <string name="theme_mocha_description">Dark Catppuccin</string>
 
     <!-- Coin templates (domain/CoinTemplates.kt) — id is the stable lookup key; only the name and
          choices are localized. Every string-array below must keep the same item count as its

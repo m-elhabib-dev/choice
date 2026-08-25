@@ -31,6 +31,8 @@ import androidx.glance.text.TextStyle
 import com.choice.app.ChoiceApplication
 import com.choice.app.R
 import com.choice.app.locale.LocaleApplier
+import com.choice.app.ui.theme.SharedPreferencesThemeStore
+import com.choice.app.ui.theme.resolveThemeFlavor
 import kotlinx.coroutines.flow.firstOrNull
 
 /**
@@ -55,13 +57,15 @@ sealed interface SingleCoinWidgetState {
 class SingleCoinWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        // resolveState (repository + WidgetConfigStore access) is unaffected by locale — only
-        // rendering (getString calls inside the composables below) needs the localized context
-        // (WL-1, WL-3).
+        // resolveState (repository + WidgetConfigStore access) is unaffected by locale or theme —
+        // only rendering (getString calls, color roles) needs the localized context / resolved
+        // flavor (WL-1, WL-3; WP-3).
         val state = resolveState(context, id)
         val localized = LocaleApplier.localizedContext(context)
+        val flavor = resolveThemeFlavor(SharedPreferencesThemeStore(context).read())
+        val colors = WidgetGlanceTheme.colorsFor(flavor)
         provideContent {
-            CompositionLocalProvider(LocalContext provides localized) {
+            CompositionLocalProvider(LocalContext provides localized, LocalWidgetColors provides colors) {
                 SingleCoinWidgetContent(state)
             }
         }
@@ -95,10 +99,11 @@ class SingleCoinWidget : GlanceAppWidget() {
 
 @Composable
 private fun SingleCoinWidgetContent(state: SingleCoinWidgetState) {
+    val colors = LocalWidgetColors.current
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(WidgetGlanceTheme.background)
+            .background(colors.background)
             .cornerRadius(16.dp)
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -117,15 +122,16 @@ private fun SingleCoinWidgetContent(state: SingleCoinWidgetState) {
 @Composable
 private fun UnavailableContent() {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = context.getString(R.string.widget_state_unavailable),
-            style = TextStyle(color = WidgetGlanceTheme.textPrimary, fontWeight = FontWeight.Medium),
+            style = TextStyle(color = colors.textPrimary, fontWeight = FontWeight.Medium),
         )
         Spacer(modifier = GlanceModifier.height(8.dp))
         Text(
             text = context.getString(R.string.widget_action_reconfigure),
-            style = TextStyle(color = WidgetGlanceTheme.accent, fontWeight = FontWeight.Bold),
+            style = TextStyle(color = colors.accent, fontWeight = FontWeight.Bold),
             modifier = GlanceModifier
                 .clickable(actionRunCallback<ReconfigureSingleCoinAction>())
                 .semantics { contentDescription = context.getString(R.string.widget_action_reconfigure) },
@@ -133,7 +139,7 @@ private fun UnavailableContent() {
         Spacer(modifier = GlanceModifier.height(4.dp))
         Text(
             text = context.getString(R.string.widget_action_open_app),
-            style = TextStyle(color = WidgetGlanceTheme.textSecondary),
+            style = TextStyle(color = colors.textSecondary),
             // No coinId parameter: OpenCoinInAppAction falls back to the app's main coin list.
             modifier = GlanceModifier
                 .clickable(actionRunCallback<OpenCoinInAppAction>())
@@ -146,12 +152,13 @@ private fun UnavailableContent() {
 @Composable
 private fun TooFewChoicesContent(state: SingleCoinWidgetState.TooFewChoices) {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         CoinNameHeader(coinId = state.coinId, coinName = state.coinName)
         Spacer(modifier = GlanceModifier.height(8.dp))
         Text(
             text = context.getString(R.string.widget_state_too_few_choices),
-            style = TextStyle(color = WidgetGlanceTheme.textSecondary, textAlign = TextAlign.Center),
+            style = TextStyle(color = colors.textSecondary, textAlign = TextAlign.Center),
             modifier = GlanceModifier.semantics {
                 contentDescription = "${state.coinName}: ${context.getString(R.string.widget_state_too_few_choices)}"
             },
@@ -163,13 +170,14 @@ private fun TooFewChoicesContent(state: SingleCoinWidgetState.TooFewChoices) {
 @Composable
 private fun ReadyContent(state: SingleCoinWidgetState.Ready) {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     val bidi = BidiFormatter.getInstance()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         CoinNameHeader(coinId = state.coinId, coinName = state.coinName)
         Spacer(modifier = GlanceModifier.height(6.dp))
         Text(
             text = context.getString(R.string.widget_state_ready),
-            style = TextStyle(color = WidgetGlanceTheme.textSecondary),
+            style = TextStyle(color = colors.textSecondary),
             modifier = GlanceModifier.semantics {
                 contentDescription = context.getString(R.string.cd_widget_coin_ready, bidi.unicodeWrap(state.coinName))
             },
@@ -183,11 +191,12 @@ private fun ReadyContent(state: SingleCoinWidgetState.Ready) {
 @Composable
 private fun ResultContent(state: SingleCoinWidgetState.Result) {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     val bidi = BidiFormatter.getInstance()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = state.coinName,
-            style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 12.sp),
+            style = TextStyle(color = colors.textSecondary, fontSize = 12.sp),
             modifier = GlanceModifier
                 .clickable(
                     actionRunCallback<OpenCoinInAppAction>(
@@ -202,7 +211,7 @@ private fun ResultContent(state: SingleCoinWidgetState.Result) {
         Text(
             text = state.resultText,
             style = TextStyle(
-                color = WidgetGlanceTheme.textPrimary,
+                color = colors.textPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
@@ -223,11 +232,12 @@ private fun ResultContent(state: SingleCoinWidgetState.Result) {
 @Composable
 private fun CoinNameHeader(coinId: Long, coinName: String) {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     val bidi = BidiFormatter.getInstance()
     Text(
         text = coinName,
         style = TextStyle(
-            color = WidgetGlanceTheme.textPrimary,
+            color = colors.textPrimary,
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
         ),
@@ -253,6 +263,7 @@ private fun CoinNameHeader(coinId: Long, coinName: String) {
 @Composable
 private fun FlipControl(primary: Boolean, coinName: String) {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     val bidi = BidiFormatter.getInstance()
     val label = context.getString(R.string.widget_action_flip)
     val flipModifier = GlanceModifier
@@ -269,19 +280,19 @@ private fun FlipControl(primary: Boolean, coinName: String) {
         Text(
             text = label,
             style = TextStyle(
-                color = WidgetGlanceTheme.textPrimary,
+                color = colors.textPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
             ),
             modifier = flipModifier
-                .background(WidgetGlanceTheme.surface)
+                .background(colors.surface)
                 .cornerRadius(8.dp)
                 .padding(horizontal = 20.dp, vertical = 10.dp),
         )
     } else {
         Text(
             text = label,
-            style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 12.sp),
+            style = TextStyle(color = colors.textSecondary, fontSize = 12.sp),
             modifier = flipModifier,
         )
     }

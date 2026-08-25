@@ -37,6 +37,8 @@ import com.choice.app.ChoiceApplication
 import com.choice.app.R
 import com.choice.app.domain.CoinWithChoices
 import com.choice.app.locale.LocaleApplier
+import com.choice.app.ui.theme.SharedPreferencesThemeStore
+import com.choice.app.ui.theme.resolveThemeFlavor
 import kotlinx.coroutines.flow.firstOrNull
 
 /**
@@ -87,13 +89,15 @@ internal fun resolveQuickCoinsCoins(
 class QuickCoinsWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        // resolveState (repository + WidgetConfigStore access) is unaffected by locale — only
-        // rendering (getString calls inside the composables below) needs the localized context
-        // (WL-1, WL-3).
+        // resolveState (repository + WidgetConfigStore access) is unaffected by locale or theme —
+        // only rendering (getString calls, color roles) needs the localized context / resolved
+        // flavor (WL-1, WL-3; WP-3).
         val state = resolveState(context, id)
         val localized = LocaleApplier.localizedContext(context)
+        val flavor = resolveThemeFlavor(SharedPreferencesThemeStore(context).read())
+        val colors = WidgetGlanceTheme.colorsFor(flavor)
         provideContent {
-            CompositionLocalProvider(LocalContext provides localized) {
+            CompositionLocalProvider(LocalContext provides localized, LocalWidgetColors provides colors) {
                 QuickCoinsWidgetContent(state)
             }
         }
@@ -152,10 +156,11 @@ private fun maxVisibleRows(availableHeight: Dp): Int =
 @Composable
 private fun QuickCoinsWidgetContent(state: QuickCoinsWidgetState) {
     val size = LocalSize.current
+    val colors = LocalWidgetColors.current
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(WidgetGlanceTheme.background)
+            .background(colors.background)
             .cornerRadius(16.dp)
             .padding(8.dp),
     ) {
@@ -184,6 +189,7 @@ private fun QuickCoinsWidgetContent(state: QuickCoinsWidgetState) {
 @Composable
 private fun NoCoinsSelectedContent() {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     Column(
         modifier = GlanceModifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -191,12 +197,12 @@ private fun NoCoinsSelectedContent() {
     ) {
         Text(
             text = context.getString(R.string.widget_state_no_coins_selected),
-            style = TextStyle(color = WidgetGlanceTheme.textPrimary, fontWeight = FontWeight.Medium),
+            style = TextStyle(color = colors.textPrimary, fontWeight = FontWeight.Medium),
         )
         Spacer(modifier = GlanceModifier.height(8.dp))
         Text(
             text = context.getString(R.string.widget_action_reconfigure),
-            style = TextStyle(color = WidgetGlanceTheme.accent, fontWeight = FontWeight.Bold),
+            style = TextStyle(color = colors.accent, fontWeight = FontWeight.Bold),
             modifier = GlanceModifier
                 .clickable(actionRunCallback<ReconfigureQuickCoinsAction>())
                 .semantics { contentDescription = context.getString(R.string.widget_action_reconfigure) },
@@ -204,7 +210,7 @@ private fun NoCoinsSelectedContent() {
         Spacer(modifier = GlanceModifier.height(4.dp))
         Text(
             text = context.getString(R.string.widget_action_open_app),
-            style = TextStyle(color = WidgetGlanceTheme.textSecondary),
+            style = TextStyle(color = colors.textSecondary),
             // No coinId parameter: OpenCoinInAppAction falls back to the app's main coin list.
             modifier = GlanceModifier
                 .clickable(actionRunCallback<OpenCoinInAppAction>())
@@ -216,6 +222,7 @@ private fun NoCoinsSelectedContent() {
 @Composable
 private fun QuickCoinRow(row: QuickCoinRowState) {
     val context = LocalContext.current
+    val colors = LocalWidgetColors.current
     val bidi = BidiFormatter.getInstance()
     val coinId = when (row) {
         is QuickCoinRowState.TooFewChoices -> row.coinId
@@ -231,7 +238,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .background(WidgetGlanceTheme.surface)
+            .background(colors.surface)
             .cornerRadius(10.dp)
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -248,7 +255,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
             Text(
                 text = coinName,
                 style = TextStyle(
-                    color = WidgetGlanceTheme.textPrimary,
+                    color = colors.textPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                 ),
@@ -261,7 +268,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                 is QuickCoinRowState.TooFewChoices -> Text(
                     text = context.getString(R.string.widget_state_too_few_choices),
                     style = TextStyle(
-                        color = WidgetGlanceTheme.textSecondary,
+                        color = colors.textSecondary,
                         fontSize = 11.sp,
                         textAlign = TextAlign.Start,
                     ),
@@ -273,7 +280,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                 )
                 is QuickCoinRowState.Ready -> Text(
                     text = context.getString(R.string.widget_state_ready),
-                    style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 11.sp),
+                    style = TextStyle(color = colors.textSecondary, fontSize = 11.sp),
                     maxLines = 1,
                     modifier = GlanceModifier.semantics {
                         contentDescription = context.getString(R.string.cd_widget_coin_ready, bidi.unicodeWrap(coinName))
@@ -281,7 +288,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                 )
                 is QuickCoinRowState.Result -> Text(
                     text = row.resultText,
-                    style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 11.sp),
+                    style = TextStyle(color = colors.textSecondary, fontSize = 11.sp),
                     maxLines = 1,
                     modifier = GlanceModifier.semantics {
                         contentDescription = context.getString(
@@ -299,12 +306,12 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
             Text(
                 text = context.getString(R.string.widget_action_flip),
                 style = TextStyle(
-                    color = WidgetGlanceTheme.textPrimary,
+                    color = colors.textPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp,
                 ),
                 modifier = GlanceModifier
-                    .background(WidgetGlanceTheme.surfaceVariant)
+                    .background(colors.surfaceVariant)
                     .cornerRadius(8.dp)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
                     .clickable(

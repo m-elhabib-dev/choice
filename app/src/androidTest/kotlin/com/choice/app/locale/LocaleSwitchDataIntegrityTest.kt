@@ -7,6 +7,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import com.choice.app.ui.settings.SettingsViewModel
+import com.choice.app.ui.theme.AppThemeState
+import com.choice.app.ui.theme.SharedPreferencesThemeStore
+import com.choice.app.ui.theme.resolveThemeFlavor
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -62,10 +65,14 @@ class LocaleSwitchDataIntegrityTest {
         val beforeHistory = repository.observeDecisionHistory(arabicNamedCoinId).first()
 
         // 1. Switch via the in-app selector (SettingsViewModel wraps the exact write+apply path
-        //    the real Settings screen uses).
+        //    the real Settings screen uses). The theme store/state are unused by this test's
+        //    assertions — they exist only because SettingsViewModel now also owns theme selection.
+        val themeStore = SharedPreferencesThemeStore(context)
         val settingsViewModel = SettingsViewModel(
             context = context,
             languagePreferenceStore = store,
+            themePreferenceStore = themeStore,
+            themeState = AppThemeState(resolveThemeFlavor(themeStore.read())),
             systemLanguageTags = { listOf("en-US") },
         )
         settingsViewModel.selectLanguage(SupportedLanguages.ARABIC)

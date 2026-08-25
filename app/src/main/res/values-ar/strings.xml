@@ -112,6 +112,15 @@
     <string name="settings_language_system">لغة النظام</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_arabic">العربية</string>
+    <string name="settings_appearance_label">المظهر</string>
+    <string name="theme_latte_name">لاتيه</string>
+    <string name="theme_latte_description">كاتبوتشين فاتح</string>
+    <string name="theme_frappe_name">فرابيه</string>
+    <string name="theme_frappe_description">كاتبوتشين غامق</string>
+    <string name="theme_macchiato_name">ماكياتو</string>
+    <string name="theme_macchiato_description">كاتبوتشين غامق</string>
+    <string name="theme_mocha_name">موكا</string>
+    <string name="theme_mocha_description">كاتبوتشين غامق</string>
 
     <!-- Coin templates (domain/CoinTemplates.kt) -->
     <string name="template_breakfast_name">الإفطار</string>

@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -42,7 +44,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ChoiceTheme {
+            val flavor by (application as ChoiceApplication).themeState.flavor.collectAsState()
+            ChoiceTheme(flavor) {
                 ChoiceNavHost(
                     initialPayload = intent?.takeIf {
                         it.action == android.content.Intent.ACTION_SEND
@@ -105,6 +108,8 @@ private fun ChoiceNavHost(initialPayload: String? = null, openCoinId: Long? = nu
             val factory = SettingsViewModelFactory(
                 context,
                 application.languagePreferenceStore,
+                application.themePreferenceStore,
+                application.themeState,
                 refreshWidgets = { application.widgetRefreshCoordinator.refreshAll() },
             )
             val viewModel: SettingsViewModel = viewModel(factory = factory)

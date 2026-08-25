@@ -31,11 +31,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.choice.app.R
 import com.choice.app.locale.SupportedLanguages
+import com.choice.app.ui.components.ThemeOptionRow
+import com.choice.app.ui.theme.ThemeFlavor
 
 /**
- * Choice's only app-level settings screen — language, and nothing else (Principle I, Principle
- * VIII; contracts/navigation-contract.md §2). Reachable from a settings icon in `MainScreen`'s
- * `TopAppBar`.
+ * Choice's only app-level settings screen — language and appearance (Principle I, Principle VIII;
+ * contracts/navigation-contract.md §2, contracts/theme-contract.md §7). Reachable from a settings
+ * icon in `MainScreen`'s `TopAppBar`.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +47,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     var selectedTag by remember { mutableStateOf(viewModel.currentLanguageTag()) }
+    var selectedFlavor by remember { mutableStateOf(viewModel.currentThemeFlavor()) }
 
     val options = listOf(
         null to stringResource(R.string.settings_language_system),
@@ -118,6 +121,28 @@ fun SettingsScreen(
                         modifier = Modifier.padding(start = 12.dp),
                     )
                 }
+            }
+
+            Text(
+                text = stringResource(R.string.settings_appearance_label),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+            )
+
+            ThemeFlavor.entries.forEach { flavor ->
+                val isSelected = flavor == selectedFlavor
+                ThemeOptionRow(
+                    flavor = flavor,
+                    selected = isSelected,
+                    onClick = {
+                        // TA-2: re-selecting the already-active theme is a no-op — no write, no
+                        // AppThemeState.set, no widget refresh.
+                        if (isSelected) return@ThemeOptionRow
+                        selectedFlavor = flavor
+                        viewModel.selectTheme(flavor)
+                    },
+                )
             }
         }
     }

@@ -47,6 +47,8 @@ import com.choice.app.R
 import com.choice.app.domain.CoinWithChoices
 import com.choice.app.locale.LocaleApplier
 import com.choice.app.ui.theme.ChoiceTheme
+import com.choice.app.ui.theme.SharedPreferencesThemeStore
+import com.choice.app.ui.theme.resolveThemeFlavor
 import kotlinx.coroutines.launch
 
 /**
@@ -82,7 +84,11 @@ class QuickCoinsWidgetConfigActivity : ComponentActivity() {
         val coinRepository = (application as ChoiceApplication).appContainer.coinRepository
 
         setContent {
-            ChoiceTheme {
+            // One-shot, synchronous read — this configuration UI is short-lived and does not
+            // need to observe a theme change made elsewhere in the same session
+            // (contracts/theme-contract.md §4 table).
+            val flavor = resolveThemeFlavor(SharedPreferencesThemeStore(this).read())
+            ChoiceTheme(flavor) {
                 val coroutineScope = rememberCoroutineScope()
                 val coins by coinRepository.observeCoins()
                     .collectAsStateWithLifecycle(initialValue = null)

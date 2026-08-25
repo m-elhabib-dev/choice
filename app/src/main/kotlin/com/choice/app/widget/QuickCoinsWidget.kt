@@ -2,6 +2,8 @@ package com.choice.app.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.core.text.BidiFormatter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +36,7 @@ import androidx.glance.text.TextStyle
 import com.choice.app.ChoiceApplication
 import com.choice.app.R
 import com.choice.app.domain.CoinWithChoices
+import com.choice.app.locale.LocaleApplier
 import kotlinx.coroutines.flow.firstOrNull
 
 /**
@@ -84,9 +87,15 @@ internal fun resolveQuickCoinsCoins(
 class QuickCoinsWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        // resolveState (repository + WidgetConfigStore access) is unaffected by locale — only
+        // rendering (getString calls inside the composables below) needs the localized context
+        // (WL-1, WL-3).
         val state = resolveState(context, id)
+        val localized = LocaleApplier.localizedContext(context)
         provideContent {
-            QuickCoinsWidgetContent(state)
+            CompositionLocalProvider(LocalContext provides localized) {
+                QuickCoinsWidgetContent(state)
+            }
         }
     }
 
@@ -207,6 +216,7 @@ private fun NoCoinsSelectedContent() {
 @Composable
 private fun QuickCoinRow(row: QuickCoinRowState) {
     val context = LocalContext.current
+    val bidi = BidiFormatter.getInstance()
     val coinId = when (row) {
         is QuickCoinRowState.TooFewChoices -> row.coinId
         is QuickCoinRowState.Ready -> row.coinId
@@ -244,7 +254,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                 ),
                 maxLines = 1,
                 modifier = GlanceModifier.semantics {
-                    contentDescription = "$coinName, ${context.getString(R.string.widget_action_open_app)}"
+                    contentDescription = context.getString(R.string.cd_widget_open_app, bidi.unicodeWrap(coinName))
                 },
             )
             when (row) {
@@ -266,7 +276,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                     style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 11.sp),
                     maxLines = 1,
                     modifier = GlanceModifier.semantics {
-                        contentDescription = "$coinName: ${context.getString(R.string.widget_state_ready)}"
+                        contentDescription = context.getString(R.string.cd_widget_coin_ready, bidi.unicodeWrap(coinName))
                     },
                 )
                 is QuickCoinRowState.Result -> Text(
@@ -274,7 +284,11 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                     style = TextStyle(color = WidgetGlanceTheme.textSecondary, fontSize = 11.sp),
                     maxLines = 1,
                     modifier = GlanceModifier.semantics {
-                        contentDescription = "$coinName result: ${row.resultText}"
+                        contentDescription = context.getString(
+                            R.string.cd_widget_coin_result,
+                            bidi.unicodeWrap(coinName),
+                            bidi.unicodeWrap(row.resultText),
+                        )
                     },
                 )
             }
@@ -299,7 +313,7 @@ private fun QuickCoinRow(row: QuickCoinRowState) {
                         ),
                     )
                     .semantics {
-                        contentDescription = "${context.getString(R.string.widget_action_flip)} $coinName"
+                        contentDescription = context.getString(R.string.cd_widget_flip_coin, bidi.unicodeWrap(coinName))
                     },
             )
         }

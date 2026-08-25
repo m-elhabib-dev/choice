@@ -5,6 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepository
 import com.choice.app.domain.CoinWithChoices
 import com.choice.app.domain.SharedCoin
@@ -17,6 +19,8 @@ class ImportCoinScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
     private val fakeRepository = object : CoinRepository {
         var importedPayload: SharedCoin? = null
@@ -52,8 +56,8 @@ class ImportCoinScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Import Coin").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Paste a shared coin payload below to import it as a new coin.").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.share_import_title)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.share_import_instructions)).assertIsDisplayed()
     }
 
     @Test
@@ -67,7 +71,7 @@ class ImportCoinScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Import").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.share_import_action)).assertIsDisplayed()
     }
 
     @Test
@@ -81,8 +85,8 @@ class ImportCoinScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Import").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.share_import_action)).performClick()
 
-        composeTestRule.onNodeWithText("Please paste a coin payload").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.share_error_empty_payload)).assertIsDisplayed()
     }
 }

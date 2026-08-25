@@ -1,5 +1,6 @@
 package com.choice.app.ui.coinedit
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -11,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import kotlinx.coroutines.flow.first
@@ -29,13 +31,12 @@ class CoinEditScreenCreateTest {
 
     private lateinit var database: ChoiceDatabase
     private lateinit var repository: CoinRepositoryImpl
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            ChoiceDatabase::class.java,
-        ).build()
+        context = ApplicationProvider.getApplicationContext()
+        database = Room.inMemoryDatabaseBuilder(context, ChoiceDatabase::class.java).build()
         repository = CoinRepositoryImpl(database.coinDao())
     }
 
@@ -60,7 +61,7 @@ class CoinEditScreenCreateTest {
         composeTestRule.onAllNodesWithTag("choice").onFirst().performTextInput("Ful")
         composeTestRule.onAllNodesWithTag("choice")[1].performTextInput("Eggs")
 
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_save)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.isSaved }
 
@@ -86,13 +87,13 @@ class CoinEditScreenCreateTest {
         composeTestRule.onAllNodesWithTag("choice").onFirst().performTextInput("Ful")
 
         // Remove the second choice, leaving only 1
-        composeTestRule.onAllNodesWithContentDescription("Remove choice")[1].performClick()
+        composeTestRule.onAllNodesWithContentDescription(context.getString(R.string.cd_remove_choice))[1].performClick()
 
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_save)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.formError != null }
 
-        composeTestRule.onNodeWithText("At least 2 choices are required").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_error_too_few_choices)).assertIsDisplayed()
 
         val coins = runBlocking { repository.observeCoins().first() }
         assertEquals(0, coins.size)
@@ -112,11 +113,11 @@ class CoinEditScreenCreateTest {
         composeTestRule.onAllNodesWithTag("choice").onFirst().performTextInput("Ful")
         composeTestRule.onAllNodesWithTag("choice")[1].performTextInput("Eggs")
 
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_save)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.nameError != null }
 
-        composeTestRule.onNodeWithText("Name cannot be blank").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_error_name_blank)).assertIsDisplayed()
 
         val coins = runBlocking { repository.observeCoins().first() }
         assertEquals(0, coins.size)
@@ -137,11 +138,11 @@ class CoinEditScreenCreateTest {
         composeTestRule.onAllNodesWithTag("choice").onFirst().performTextInput("Ful")
         // Leave second choice blank
 
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_save)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.choices.any { it.error != null } }
 
-        composeTestRule.onNodeWithText("Choice cannot be blank").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_error_choice_blank)).assertIsDisplayed()
 
         val coins = runBlocking { repository.observeCoins().first() }
         assertEquals(0, coins.size)

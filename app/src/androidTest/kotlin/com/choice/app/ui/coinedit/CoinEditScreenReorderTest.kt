@@ -1,5 +1,6 @@
 package com.choice.app.ui.coinedit
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
@@ -8,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import kotlinx.coroutines.flow.first
@@ -25,13 +27,12 @@ class CoinEditScreenReorderTest {
 
     private lateinit var database: ChoiceDatabase
     private lateinit var repository: CoinRepositoryImpl
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            ChoiceDatabase::class.java,
-        ).build()
+        context = ApplicationProvider.getApplicationContext()
+        database = Room.inMemoryDatabaseBuilder(context, ChoiceDatabase::class.java).build()
         repository = CoinRepositoryImpl(database.coinDao())
     }
 
@@ -58,9 +59,9 @@ class CoinEditScreenReorderTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.name == "Breakfast" }
 
-        composeTestRule.onAllNodesWithContentDescription("Move up").onFirst().performClick()
+        composeTestRule.onAllNodesWithContentDescription(context.getString(R.string.cd_move_choice_up)).onFirst().performClick()
 
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_save)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.isSaved }
 
@@ -85,10 +86,10 @@ class CoinEditScreenReorderTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.name == "Breakfast" }
 
-        val moveDownButtons = composeTestRule.onAllNodesWithContentDescription("Move down")
+        val moveDownButtons = composeTestRule.onAllNodesWithContentDescription(context.getString(R.string.cd_move_choice_down))
         moveDownButtons.onFirst().performClick()
 
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_edit_save)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.isSaved }
 
@@ -113,7 +114,7 @@ class CoinEditScreenReorderTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.name == "Breakfast" }
 
-        val moveUpButtons = composeTestRule.onAllNodesWithContentDescription("Move up")
+        val moveUpButtons = composeTestRule.onAllNodesWithContentDescription(context.getString(R.string.cd_move_choice_up))
         moveUpButtons.onFirst().assertIsDisplayed()
     }
 
@@ -131,7 +132,7 @@ class CoinEditScreenReorderTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.name == "Breakfast" }
 
-        val moveDownButtons = composeTestRule.onAllNodesWithContentDescription("Move down")
+        val moveDownButtons = composeTestRule.onAllNodesWithContentDescription(context.getString(R.string.cd_move_choice_down))
         moveDownButtons.onFirst().assertIsDisplayed()
     }
 }

@@ -26,13 +26,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.choice.app.ui.components.EmptyState
+import com.choice.app.R
 import com.choice.app.domain.Decision
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.choice.app.locale.formattingLocale
+import com.choice.app.ui.components.EmptyState
+import com.choice.app.ui.format.DecisionTimeFormatter
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,12 +49,12 @@ fun HistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("History") },
+                title = { Text(stringResource(R.string.history_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -60,7 +63,7 @@ fun HistoryScreen(
                         IconButton(onClick = onStatistics) {
                             Icon(
                             imageVector = Icons.Filled.Info,
-                            contentDescription = "Statistics",
+                            contentDescription = stringResource(R.string.cd_statistics),
                             )
                         }
                     }
@@ -75,8 +78,8 @@ fun HistoryScreen(
     ) { padding ->
         if (uiState.isEmpty) {
             EmptyState(
-                title = "No decisions yet",
-                subtitle = "Accepted decisions will appear here",
+                title = stringResource(R.string.history_empty_title),
+                subtitle = stringResource(R.string.history_empty_subtitle),
                 modifier = Modifier.padding(padding),
             )
         } else {
@@ -97,6 +100,7 @@ fun HistoryScreen(
 
 @Composable
 private fun DecisionCard(decision: Decision) {
+    val formattingLocale = formattingLocale(LocalConfiguration.current.locales[0].language)
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -113,16 +117,11 @@ private fun DecisionCard(decision: Decision) {
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = formatTimestamp(decision.decidedAt),
+                text = DecisionTimeFormatter.format(decision.decidedAt, formattingLocale, ZoneId.systemDefault()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp),
             )
         }
     }
-}
-
-private fun formatTimestamp(timestamp: Long): String {
-    val sdf = SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault())
-    return sdf.format(Date(timestamp))
 }

@@ -1,11 +1,13 @@
 package com.choice.app.ui.coinflip
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import kotlinx.coroutines.flow.first
@@ -22,13 +24,12 @@ class CoinFlipScreenTest {
 
     private lateinit var database: ChoiceDatabase
     private lateinit var repository: CoinRepositoryImpl
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            ChoiceDatabase::class.java,
-        ).build()
+        context = ApplicationProvider.getApplicationContext()
+        database = Room.inMemoryDatabaseBuilder(context, ChoiceDatabase::class.java).build()
         repository = CoinRepositoryImpl(database.coinDao())
     }
 
@@ -60,7 +61,7 @@ class CoinFlipScreenTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
@@ -97,12 +98,12 @@ class CoinFlipScreenTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
-        composeTestRule.onNodeWithText("Flip Again").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Flip").assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip_again)).assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).assertDoesNotExist()
     }
 
     @Test

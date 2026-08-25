@@ -31,10 +31,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.choice.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +51,7 @@ fun CoinFlipScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val shareChooserTitle = stringResource(R.string.share_chooser_title)
 
     // Per contracts/widget-action-contract.md: a coinId that no longer resolves (e.g. deleted
     // between a widget's render and the tap that deep-linked here, US5 AS3) falls back to a
@@ -67,7 +70,7 @@ fun CoinFlipScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -79,29 +82,29 @@ fun CoinFlipScreen(
                             type = "text/plain"
                             putExtra(Intent.EXTRA_TEXT, payload)
                         }
-                        context.startActivity(Intent.createChooser(sendIntent, "Share coin"))
+                        context.startActivity(Intent.createChooser(sendIntent, shareChooserTitle))
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Share,
-                            contentDescription = "Share coin",
+                            contentDescription = stringResource(R.string.cd_share_coin),
                         )
                     }
                     IconButton(onClick = { onHistory(uiState.coinId) }) {
                         Icon(
                             imageVector = Icons.Filled.List,
-                            contentDescription = "Decision history",
+                            contentDescription = stringResource(R.string.cd_decision_history),
                         )
                     }
                     IconButton(onClick = { onSettings(uiState.coinId) }) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
-                            contentDescription = "Coin settings",
+                            contentDescription = stringResource(R.string.cd_coin_settings),
                         )
                     }
                     IconButton(onClick = { onEditCoin(uiState.coinId) }) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
-                            contentDescription = "Edit coin",
+                            contentDescription = stringResource(R.string.cd_edit_coin),
                         )
                     }
                 },
@@ -127,13 +130,15 @@ fun CoinFlipScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = "Flip",
+                        text = stringResource(R.string.coin_flip_action_flip),
                         fontSize = 20.sp,
                     )
                 }
             } else {
                 Text(
-                    text = if (uiState.accepted) "Decision accepted" else "Your decision:",
+                    text = stringResource(
+                        if (uiState.accepted) R.string.coin_flip_decision_accepted else R.string.coin_flip_your_decision,
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -156,7 +161,7 @@ fun CoinFlipScreen(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = "Accept",
+                            text = stringResource(R.string.coin_flip_action_accept),
                             fontSize = 18.sp,
                         )
                     }
@@ -168,7 +173,7 @@ fun CoinFlipScreen(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = "Flip again",
+                            text = stringResource(R.string.coin_flip_action_flip_again),
                             fontSize = 16.sp,
                         )
                     }

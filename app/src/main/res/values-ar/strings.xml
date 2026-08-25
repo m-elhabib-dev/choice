@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (ar) translation overlay.
+  Contract: contracts/localization-contract.md §5.1 — this file MUST mirror
+  values/strings.xml key-for-key (SR-2). Every key added to values/strings.xml
+  needs a matching entry here (except app_name, which is translatable="false").
+  Android Lint's MissingTranslation/ExtraTranslation checks (see app/build.gradle.kts)
+  enforce this at build time.
+-->
+<resources>
+    <!-- Widgets -->
+    <string name="widget_single_coin_label">عملة واحدة</string>
+    <string name="widget_single_coin_description">اقلب إحدى عملاتك المحفوظة مباشرة من الشاشة الرئيسية.</string>
+    <string name="widget_quick_coins_label">عملات سريعة</string>
+    <string name="widget_quick_coins_description">اقلب عدة عملات مفضّلة مباشرة من الشاشة الرئيسية.</string>
+
+    <string name="widget_state_ready">جاهزة للقلب</string>
+    <string name="widget_state_unavailable">الودجت غير متاحة</string>
+    <string name="widget_state_no_coins_selected">لم يتم اختيار أي عملة</string>
+    <string name="widget_state_too_few_choices">تعذّر اتخاذ القرار — أضف اختيارًا آخر</string>
+    <string name="widget_state_no_coins_at_all">أنشئ عملة في التطبيق أولاً</string>
+    <string name="widget_action_flip">قلب</string>
+    <string name="widget_action_reconfigure">إعادة الضبط</string>
+    <string name="widget_action_open_app">فتح التطبيق</string>
+    <string name="widget_action_create_coin">إنشاء عملة</string>
+    <string name="widget_config_choose_coin_title">اختر عملة</string>
+    <string name="widget_config_use_favorites_title">استخدام المفضلة</string>
+    <string name="widget_config_use_favorites_description">تحديث تلقائي — يعرض دائمًا عملاتك المفضلة الحالية</string>
+    <string name="widget_config_confirm_selection">حفظ</string>
+    <string name="cd_widget_open_app">%1$s، فتح التطبيق</string>
+    <string name="cd_widget_coin_ready">%1$s: جاهز للقلب</string>
+    <string name="cd_widget_coin_result">%1$s: النتيجة %2$s</string>
+    <string name="cd_widget_flip_coin">قلب %1$s</string>
+    <string name="cd_widget_action_for_coin">%1$s %2$s</string>
+
+    <!-- Shared across screens -->
+    <string name="cd_back">رجوع</string>
+    <string name="cd_edit_coin">تعديل العملة</string>
+    <string name="cd_statistics">الإحصائيات</string>
+
+    <!-- Main screen -->
+    <string name="cd_create_coin">إنشاء عملة</string>
+    <string name="main_empty_title">لا توجد عملات بعد</string>
+    <string name="main_empty_subtitle">أنشئ عملتك الأولى للبدء</string>
+    <string name="main_action_create_coin">إنشاء عملة</string>
+    <string name="main_search_placeholder">البحث عن العملات...</string>
+    <string name="cd_search">بحث</string>
+    <string name="main_section_quick_coins">العملات السريعة</string>
+    <string name="main_section_all_coins">جميع العملات</string>
+    <string name="main_no_results_title">لا توجد عملات مطابقة</string>
+    <string name="main_no_results_subtitle">جرّب كلمة بحث مختلفة</string>
+    <string name="cd_add_to_quick_coins">إضافة إلى العملات السريعة</string>
+    <string name="cd_remove_from_quick_coins">إزالة من العملات السريعة</string>
+    <plurals name="coin_choice_count">
+        <item quantity="zero">لا اختيارات</item>
+        <item quantity="one">اختيار واحد</item>
+        <item quantity="two">اختياران</item>
+        <item quantity="few">%s اختيارات</item>
+        <item quantity="many">%s اختيارًا</item>
+        <item quantity="other">%s اختيار</item>
+    </plurals>
+
+    <!-- Delete coin confirmation dialog -->
+    <string name="delete_coin_title">حذف العملة</string>
+    <string name="delete_coin_message">هل أنت متأكد من حذف \"%1$s\"؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="delete_coin_confirm">حذف</string>
+    <string name="delete_coin_cancel">إلغاء</string>
+
+    <!-- Coin edit screen -->
+    <string name="coin_edit_title_create">إنشاء عملة</string>
+    <string name="coin_edit_title_edit">تعديل العملة</string>
+    <string name="coin_edit_name_label">اسم العملة</string>
+    <string name="coin_edit_choice_label">الاختيار %1$d</string>
+    <string name="cd_move_choice_up">نقل لأعلى</string>
+    <string name="cd_move_choice_down">نقل لأسفل</string>
+    <string name="cd_remove_choice">إزالة الاختيار</string>
+    <string name="coin_edit_add_choice">إضافة اختيار</string>
+    <string name="coin_edit_save">حفظ</string>
+    <string name="coin_edit_error_name_blank">لا يمكن ترك الاسم فارغًا</string>
+    <string name="coin_edit_error_choice_blank">لا يمكن ترك الاختيار فارغًا</string>
+    <string name="coin_edit_error_too_few_choices">يلزم توفر اختيارين على الأقل</string>
+
+    <!-- Coin flip (decision) screen -->
+    <string name="cd_share_coin">مشاركة العملة</string>
+    <string name="share_chooser_title">مشاركة العملة</string>
+    <string name="cd_decision_history">سجل القرارات</string>
+    <string name="cd_coin_settings">إعدادات العملة</string>
+    <string name="coin_flip_action_flip">قلب</string>
+    <string name="coin_flip_your_decision">قرارك:</string>
+    <string name="coin_flip_decision_accepted">تم قبول القرار</string>
+    <string name="coin_flip_action_accept">قبول</string>
+    <string name="coin_flip_action_flip_again">قلب مرة أخرى</string>
+
+    <!-- Coin settings screen -->
+    <string name="coin_settings_title">إعدادات العملة</string>
+    <string name="coin_settings_weighted_title">الاختيار الموزون</string>
+    <string name="coin_settings_weighted_subtitle">لكل اختيار وزن قابل للتخصيص</string>
+    <string name="coin_settings_avoid_last_title">تجنّب النتيجة الأخيرة</string>
+    <string name="coin_settings_avoid_last_subtitle">استبعاد النتيجة السابقة من القلبة التالية</string>
+    <string name="coin_settings_choice_weights_title">أوزان الاختيارات</string>
+    <string name="coin_settings_weight_label">الوزن</string>
+    <string name="coin_settings_weight_hint">اتركه فارغًا لوزن افتراضي قدره 1</string>
+    <string name="coin_settings_save">حفظ الإعدادات</string>
+    <string name="coin_settings_share_coin">مشاركة العملة</string>
+    <string name="coin_settings_import_coin">استيراد عملة</string>
+    <string name="coin_settings_error_weight_positive">يجب أن يكون الوزن رقمًا صحيحًا موجبًا</string>
+
+    <!-- Settings screen -->
+    <string name="cd_settings">الإعدادات</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_language_label">اللغة</string>
+    <string name="settings_language_system">لغة النظام</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_arabic">العربية</string>
+
+    <!-- Coin templates (domain/CoinTemplates.kt) -->
+    <string name="template_breakfast_name">الإفطار</string>
+    <string-array name="template_breakfast_choices">
+        <item>فول</item>
+        <item>بيض</item>
+        <item>فلافل</item>
+        <item>جبنة</item>
+    </string-array>
+    <string name="template_lunch_name">الغداء</string>
+    <string-array name="template_lunch_choices">
+        <item>أرز</item>
+        <item>معكرونة</item>
+        <item>دجاج</item>
+        <item>عدس</item>
+    </string-array>
+    <string name="template_workout_name">التمرين</string>
+    <string-array name="template_workout_choices">
+        <item>الصدر</item>
+        <item>الظهر</item>
+        <item>الأرجل</item>
+        <item>الجسم كامل</item>
+    </string-array>
+    <string name="template_movie_name">فيلم</string>
+    <string-array name="template_movie_choices">
+        <item>إنترستيلر</item>
+        <item>دون</item>
+        <item>باتمان</item>
+        <item>ذا ماتريكس</item>
+    </string-array>
+
+    <!-- Template picker screen -->
+    <string name="templates_title">إنشاء عملة</string>
+    <string name="templates_choose_template">اختر قالبًا</string>
+    <string name="templates_start_blank_title">بدء من الصفر</string>
+    <string name="templates_start_blank_subtitle">إنشاء عملة من البداية</string>
+
+    <!-- History screen -->
+    <string name="history_title">السجل</string>
+    <string name="history_empty_title">لا توجد قرارات بعد</string>
+    <string name="history_empty_subtitle">ستظهر القرارات المقبولة هنا</string>
+
+    <!-- Statistics screen -->
+    <string name="statistics_title">الإحصائيات</string>
+    <string name="statistics_empty_title">لا توجد إحصائيات بعد</string>
+    <string name="statistics_empty_subtitle">اقبل بعض القرارات لعرض الإحصائيات</string>
+    <string name="statistics_total_decisions">إجمالي القرارات</string>
+    <string name="statistics_per_choice_breakdown">التفصيل حسب الاختيار</string>
+    <string name="statistics_most_frequent_suffix"> (الأكثر تكرارًا)</string>
+    <string name="statistics_least_frequent_suffix"> (الأقل تكرارًا)</string>
+    <string name="statistics_most_and_least_frequent_suffix"> (الأكثر والأقل تكرارًا)</string>
+    <string name="statistics_most_recent_decision">أحدث قرار</string>
+
+    <!-- Share / import screen -->
+    <string name="share_import_title">استيراد عملة</string>
+    <string name="share_import_instructions">الصق أدناه بيانات عملة تمت مشاركتها لاستيرادها كعملة جديدة.</string>
+    <string name="share_import_placeholder">الصق بيانات العملة هنا...</string>
+    <string name="share_import_action">استيراد</string>
+    <string name="share_error_empty_payload">يرجى لصق بيانات العملة</string>
+    <string name="share_error_invalid_json">البيانات غير صالحة — تأكد من نسخها بالكامل</string>
+    <string name="share_error_missing_schema_version">البيانات تفتقد رقم الإصدار</string>
+    <string name="share_error_unsupported_schema_version">تستخدم هذه البيانات الإصدار %1$d، وهو غير مدعوم في هذا الإصدار من Choice</string>
+    <string name="share_error_name_required">تحتاج العملة إلى اسم</string>
+    <string name="share_error_name_blank">لا يمكن ترك اسم العملة فارغًا</string>
+    <string name="share_error_name_too_long">لا يمكن أن يتجاوز اسم العملة %1$d حرفًا</string>
+    <string name="share_error_choices_required">تحتاج العملة إلى اختياراتها</string>
+    <string name="share_error_too_few_choices">يلزم توفر اختيارين على الأقل</string>
+    <string name="share_error_choice_text_required">أحد الاختيارات يفتقد نصه</string>
+    <string name="share_error_choice_text_blank">لا يمكن ترك أحد الاختيارات فارغًا</string>
+    <string name="share_error_choice_text_too_long">لا يمكن أن يتجاوز نص الاختيار %1$d حرفًا</string>
+    <string name="share_error_weight_not_a_number">يجب أن يكون وزن الاختيار رقمًا صحيحًا</string>
+    <string name="share_error_weight_not_positive">يجب أن يكون وزن الاختيار رقمًا صحيحًا موجبًا</string>
+    <string name="share_error_missing_weighted_enabled">البيانات تفتقد إعداد الترجيح</string>
+    <string name="share_error_missing_avoid_last_result_enabled">البيانات تفتقد إعداد تجنّب النتيجة الأخيرة</string>
+    <string name="share_error_invalid_boolean">البيانات تحتوي على قيمة صحيح/خطأ غير صالحة</string>
+    <string name="share_error_import_failed">فشل الاستيراد: %1$s</string>
+</resources>

@@ -2,6 +2,8 @@ package com.choice.app.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.core.text.BidiFormatter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -28,6 +30,7 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import com.choice.app.ChoiceApplication
 import com.choice.app.R
+import com.choice.app.locale.LocaleApplier
 import kotlinx.coroutines.flow.firstOrNull
 
 /**
@@ -52,9 +55,15 @@ sealed interface SingleCoinWidgetState {
 class SingleCoinWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        // resolveState (repository + WidgetConfigStore access) is unaffected by locale — only
+        // rendering (getString calls inside the composables below) needs the localized context
+        // (WL-1, WL-3).
         val state = resolveState(context, id)
+        val localized = LocaleApplier.localizedContext(context)
         provideContent {
-            SingleCoinWidgetContent(state)
+            CompositionLocalProvider(LocalContext provides localized) {
+                SingleCoinWidgetContent(state)
+            }
         }
     }
 
@@ -144,8 +153,7 @@ private fun TooFewChoicesContent(state: SingleCoinWidgetState.TooFewChoices) {
             text = context.getString(R.string.widget_state_too_few_choices),
             style = TextStyle(color = WidgetGlanceTheme.textSecondary, textAlign = TextAlign.Center),
             modifier = GlanceModifier.semantics {
-                contentDescription =
-                    "${state.coinName}: ${context.getString(R.string.widget_state_too_few_choices)}"
+                contentDescription = "${state.coinName}: ${context.getString(R.string.widget_state_too_few_choices)}"
             },
         )
     }
@@ -155,6 +163,7 @@ private fun TooFewChoicesContent(state: SingleCoinWidgetState.TooFewChoices) {
 @Composable
 private fun ReadyContent(state: SingleCoinWidgetState.Ready) {
     val context = LocalContext.current
+    val bidi = BidiFormatter.getInstance()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         CoinNameHeader(coinId = state.coinId, coinName = state.coinName)
         Spacer(modifier = GlanceModifier.height(6.dp))
@@ -162,7 +171,7 @@ private fun ReadyContent(state: SingleCoinWidgetState.Ready) {
             text = context.getString(R.string.widget_state_ready),
             style = TextStyle(color = WidgetGlanceTheme.textSecondary),
             modifier = GlanceModifier.semantics {
-                contentDescription = "${state.coinName}: ${context.getString(R.string.widget_state_ready)}"
+                contentDescription = context.getString(R.string.cd_widget_coin_ready, bidi.unicodeWrap(state.coinName))
             },
         )
         Spacer(modifier = GlanceModifier.height(10.dp))
@@ -174,6 +183,7 @@ private fun ReadyContent(state: SingleCoinWidgetState.Ready) {
 @Composable
 private fun ResultContent(state: SingleCoinWidgetState.Result) {
     val context = LocalContext.current
+    val bidi = BidiFormatter.getInstance()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = state.coinName,
@@ -185,8 +195,7 @@ private fun ResultContent(state: SingleCoinWidgetState.Result) {
                     ),
                 )
                 .semantics {
-                    contentDescription =
-                        "${state.coinName}, ${context.getString(R.string.widget_action_open_app)}"
+                    contentDescription = context.getString(R.string.cd_widget_open_app, bidi.unicodeWrap(state.coinName))
                 },
         )
         Spacer(modifier = GlanceModifier.height(4.dp))
@@ -199,7 +208,11 @@ private fun ResultContent(state: SingleCoinWidgetState.Result) {
                 textAlign = TextAlign.Center,
             ),
             modifier = GlanceModifier.semantics {
-                contentDescription = "${state.coinName} result: ${state.resultText}"
+                contentDescription = context.getString(
+                    R.string.cd_widget_coin_result,
+                    bidi.unicodeWrap(state.coinName),
+                    bidi.unicodeWrap(state.resultText),
+                )
             },
         )
         Spacer(modifier = GlanceModifier.height(10.dp))
@@ -210,6 +223,7 @@ private fun ResultContent(state: SingleCoinWidgetState.Result) {
 @Composable
 private fun CoinNameHeader(coinId: Long, coinName: String) {
     val context = LocalContext.current
+    val bidi = BidiFormatter.getInstance()
     Text(
         text = coinName,
         style = TextStyle(
@@ -224,7 +238,7 @@ private fun CoinNameHeader(coinId: Long, coinName: String) {
                 ),
             )
             .semantics {
-                contentDescription = "$coinName, ${context.getString(R.string.widget_action_open_app)}"
+                contentDescription = context.getString(R.string.cd_widget_open_app, bidi.unicodeWrap(coinName))
             },
     )
 }
@@ -239,10 +253,17 @@ private fun CoinNameHeader(coinId: Long, coinName: String) {
 @Composable
 private fun FlipControl(primary: Boolean, coinName: String) {
     val context = LocalContext.current
+    val bidi = BidiFormatter.getInstance()
     val label = context.getString(R.string.widget_action_flip)
     val flipModifier = GlanceModifier
         .clickable(actionRunCallback<FlipSingleCoinAction>())
-        .semantics { contentDescription = "$label $coinName" }
+        .semantics {
+            contentDescription = context.getString(
+                R.string.cd_widget_action_for_coin,
+                bidi.unicodeWrap(label),
+                bidi.unicodeWrap(coinName),
+            )
+        }
 
     if (primary) {
         Text(

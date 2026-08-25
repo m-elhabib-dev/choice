@@ -30,10 +30,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.choice.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +45,7 @@ fun CoinEditScreen(
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onBack()
@@ -50,12 +54,18 @@ fun CoinEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.coinId == null) "Create Coin" else "Edit Coin") },
+                title = {
+                    Text(
+                        stringResource(
+                            if (uiState.coinId == null) R.string.coin_edit_title_create else R.string.coin_edit_title_edit,
+                        ),
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -78,10 +88,10 @@ fun CoinEditScreen(
             OutlinedTextField(
                 value = uiState.name,
                 onValueChange = { if (it.length <= 40) viewModel.updateName(it) },
-                label = { Text("Coin name") },
+                label = { Text(stringResource(R.string.coin_edit_name_label)) },
                 isError = uiState.nameError != null,
                 supportingText = {
-                    uiState.nameError?.let { Text(it) }
+                    uiState.nameError?.let { Text(stringResource(it.messageRes())) }
                 },
                 singleLine = true,
                 modifier = Modifier
@@ -98,7 +108,9 @@ fun CoinEditScreen(
                     IconButton(
                         onClick = { viewModel.moveChoiceUp(index) },
                         enabled = index > 0,
-                        modifier = Modifier.semantics { contentDescription = "Move up" },
+                        modifier = Modifier.semantics {
+                            contentDescription = context.getString(R.string.cd_move_choice_up)
+                        },
                     ) {
                         Text(
                             text = "\u25B2",
@@ -108,7 +120,9 @@ fun CoinEditScreen(
                     IconButton(
                         onClick = { viewModel.moveChoiceDown(index) },
                         enabled = index < uiState.choices.size - 1,
-                        modifier = Modifier.semantics { contentDescription = "Move down" },
+                        modifier = Modifier.semantics {
+                            contentDescription = context.getString(R.string.cd_move_choice_down)
+                        },
                     ) {
                         Text(
                             text = "\u25BC",
@@ -118,10 +132,10 @@ fun CoinEditScreen(
                     OutlinedTextField(
                         value = choice.text,
                         onValueChange = { if (it.length <= 60) viewModel.updateChoice(index, it) },
-                        label = { Text("Choice ${index + 1}") },
+                        label = { Text(stringResource(R.string.coin_edit_choice_label, index + 1)) },
                         isError = choice.error != null,
                         supportingText = {
-                            choice.error?.let { Text(it) }
+                            choice.error?.let { Text(stringResource(it.messageRes())) }
                         },
                         singleLine = true,
                         modifier = Modifier
@@ -133,19 +147,19 @@ fun CoinEditScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Remove choice",
+                            contentDescription = stringResource(R.string.cd_remove_choice),
                         )
                     }
                 }
             }
 
             TextButton(onClick = { viewModel.addChoice() }) {
-                Text("Add Choice")
+                Text(stringResource(R.string.coin_edit_add_choice))
             }
 
             if (uiState.formError != null) {
                 Text(
-                    text = uiState.formError!!,
+                    text = stringResource(uiState.formError!!.messageRes()),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -153,7 +167,7 @@ fun CoinEditScreen(
 
             if (uiState.removeError != null) {
                 Text(
-                    text = uiState.removeError!!,
+                    text = stringResource(uiState.removeError!!.messageRes()),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -165,8 +179,14 @@ fun CoinEditScreen(
                 onClick = { viewModel.save() },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Save")
+                Text(stringResource(R.string.coin_edit_save))
             }
         }
     }
+}
+
+private fun CoinEditError.messageRes(): Int = when (this) {
+    CoinEditError.NAME_BLANK -> R.string.coin_edit_error_name_blank
+    CoinEditError.CHOICE_BLANK -> R.string.coin_edit_error_choice_blank
+    CoinEditError.TOO_FEW_CHOICES -> R.string.coin_edit_error_too_few_choices
 }

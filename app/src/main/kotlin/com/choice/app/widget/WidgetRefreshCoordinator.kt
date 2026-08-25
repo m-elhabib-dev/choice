@@ -16,8 +16,9 @@ import kotlinx.coroutines.launch
  * Started exactly once, from `ChoiceApplication.onCreate`, and lives for the process's lifetime.
  * It collects the existing [CoinRepository.observeCoins] Flow — already used by `MainViewModel` —
  * and, on every emission, re-renders every active instance of both widget types. There is no
- * periodic/background refresh timer; this reactive Flow collection is the only non-user-initiated
- * trigger (plan.md Constraints).
+ * periodic/background refresh timer; [CoinRepository.observeCoins] and the explicit [refreshAll]
+ * call sites (an in-app language change, a device system-language change — FR-031) are the only
+ * non-user-initiated triggers (plan.md Constraints, widget-localization-contract.md §4).
  */
 class WidgetRefreshCoordinator(
     private val context: Context,
@@ -28,10 +29,20 @@ class WidgetRefreshCoordinator(
     fun start() {
         scope.launch {
             coinRepository.observeCoins().collect {
-                // Cheap no-ops when there are zero active instances of a given widget type.
-                SingleCoinWidget().updateAll(context)
-                QuickCoinsWidget().updateAll(context)
+                refreshAll()
             }
+        }
+    }
+
+    /**
+     * Re-renders every active instance of both widget types. Idempotent, safe to call from any
+     * thread. A cheap no-op when zero instances of a widget type are placed (WR-5). Never writes
+     * `WidgetConfigStore` — this re-renders, it never re-configures (WR-3).
+     */
+    fun refreshAll() {
+        scope.launch {
+            SingleCoinWidget().updateAll(context)
+            QuickCoinsWidget().updateAll(context)
         }
     }
 }

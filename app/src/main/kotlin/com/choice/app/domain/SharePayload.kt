@@ -15,7 +15,39 @@ data class SharedChoice(
     val weight: Int?,
 )
 
-class InvalidSharePayloadException(message: String) : Exception(message)
+/**
+ * One case per validation branch below. Domain code stays free of Android resource dependencies
+ * (Principle VI) — the Composable resolves the final localized message via `stringResource`, the
+ * same pattern as `CoinEditError` (see `ImportCoinScreen.kt`).
+ */
+sealed class SharePayloadError {
+    data object MalformedJson : SharePayloadError()
+    data object MissingSchemaVersion : SharePayloadError()
+    data class UnsupportedSchemaVersion(val version: Int) : SharePayloadError()
+    data object NameRequired : SharePayloadError()
+    data object NameBlank : SharePayloadError()
+    data class NameTooLong(val maxLength: Int) : SharePayloadError()
+    data object ChoicesRequired : SharePayloadError()
+    data object TooFewChoices : SharePayloadError()
+    data object ChoiceTextRequired : SharePayloadError()
+    data object ChoiceTextBlank : SharePayloadError()
+    data class ChoiceTextTooLong(val maxLength: Int) : SharePayloadError()
+    data object WeightNotANumber : SharePayloadError()
+    data object WeightNotPositive : SharePayloadError()
+    data object MissingWeightedEnabled : SharePayloadError()
+    data object MissingAvoidLastResultEnabled : SharePayloadError()
+    data object InvalidBoolean : SharePayloadError()
+}
+
+/**
+ * [message] is a non-user-facing developer fallback only (e.g. for logs) — user-facing text is
+ * always resolved from [reason] via a `@StringRes` mapping in `ImportCoinViewModel`/
+ * `ImportCoinScreen`, never from this English string.
+ */
+class InvalidSharePayloadException(
+    val reason: SharePayloadError,
+    message: String,
+) : Exception(message)
 
 fun encodeSharedCoin(coin: SharedCoin): String {
     val sb = StringBuilder()
@@ -44,55 +76,92 @@ fun decodeSharedCoin(json: String): SharedCoin {
     val parsed = parseJsonObject(json)
 
     val schemaVersion = parsed["schemaVersion"]?.toIntOrNull()
-        ?: throw InvalidSharePayloadException("schemaVersion is required and must be a number")
+        ?: throw InvalidSharePayloadException(
+            SharePayloadError.MissingSchemaVersion,
+            "schemaVersion is required and must be a number",
+        )
     if (schemaVersion != CURRENT_SHARE_SCHEMA_VERSION) {
-        throw InvalidSharePayloadException("Unsupported schema version: $schemaVersion")
+        throw InvalidSharePayloadException(
+            SharePayloadError.UnsupportedSchemaVersion(schemaVersion),
+            "Unsupported schema version: $schemaVersion",
+        )
     }
 
     val name = parsed["name"]?.removeSurrounding("\"")
-        ?: throw InvalidSharePayloadException("name is required")
+        ?: throw InvalidSharePayloadException(SharePayloadError.NameRequired, "name is required")
     if (name.isBlank()) {
-        throw InvalidSharePayloadException("name must not be blank")
+        throw InvalidSharePayloadException(SharePayloadError.NameBlank, "name must not be blank")
     }
     if (name.length > 40) {
-        throw InvalidSharePayloadException("name must not exceed 40 characters")
+        throw InvalidSharePayloadException(
+            SharePayloadError.NameTooLong(40),
+            "name must not exceed 40 characters",
+        )
     }
 
     val choicesRaw = parsed["choices"]
-        ?: throw InvalidSharePayloadException("choices are required")
+        ?: throw InvalidSharePayloadException(SharePayloadError.ChoicesRequired, "choices are required")
     val choicesArray = parseJsonArray(choicesRaw)
     if (choicesArray.size < 2) {
-        throw InvalidSharePayloadException("At least 2 choices are required")
+        throw InvalidSharePayloadException(
+            SharePayloadError.TooFewChoices,
+            "At least 2 choices are required",
+        )
     }
 
     val choices = choicesArray.map { choiceStr ->
         val choiceObj = parseJsonObject(choiceStr.trim())
         val text = choiceObj["text"]?.removeSurrounding("\"")
-            ?: throw InvalidSharePayloadException("choice text is required")
+            ?: throw InvalidSharePayloadException(
+                SharePayloadError.ChoiceTextRequired,
+                "choice text is required",
+            )
         if (text.isBlank()) {
-            throw InvalidSharePayloadException("choice text must not be blank")
+            throw InvalidSharePayloadException(
+                SharePayloadError.ChoiceTextBlank,
+                "choice text must not be blank",
+            )
         }
         if (text.length > 60) {
-            throw InvalidSharePayloadException("choice text must not exceed 60 characters")
+            throw InvalidSharePayloadException(
+                SharePayloadError.ChoiceTextTooLong(60),
+                "choice text must not exceed 60 characters",
+            )
         }
         val weightRaw = choiceObj["weight"]
         val weight = if (weightRaw == null || weightRaw == "null") {
             null
         } else {
             val w = weightRaw.toIntOrNull()
-                ?: throw InvalidSharePayloadException("weight must be a whole number")
+                ?: throw InvalidSharePayloadException(
+                    SharePayloadError.WeightNotANumber,
+                    "weight must be a whole number",
+                )
             if (w <= 0) {
-                throw InvalidSharePayloadException("weight must be a positive whole number")
+                throw InvalidSharePayloadException(
+                    SharePayloadError.WeightNotPositive,
+                    "weight must be a positive whole number",
+                )
             }
             w
         }
         SharedChoice(text = text, weight = weight)
     }
 
-    val weightedEnabled = parseBoolean(parsed["weightedEnabled"]
-        ?: throw InvalidSharePayloadException("weightedEnabled is required"))
-    val avoidLastResultEnabled = parseBoolean(parsed["avoidLastResultEnabled"]
-        ?: throw InvalidSharePayloadException("avoidLastResultEnabled is required"))
+    val weightedEnabled = parseBoolean(
+        parsed["weightedEnabled"]
+            ?: throw InvalidSharePayloadException(
+                SharePayloadError.MissingWeightedEnabled,
+                "weightedEnabled is required",
+            ),
+    )
+    val avoidLastResultEnabled = parseBoolean(
+        parsed["avoidLastResultEnabled"]
+            ?: throw InvalidSharePayloadException(
+                SharePayloadError.MissingAvoidLastResultEnabled,
+                "avoidLastResultEnabled is required",
+            ),
+    )
 
     return SharedCoin(
         schemaVersion = schemaVersion,
@@ -106,7 +175,7 @@ fun decodeSharedCoin(json: String): SharedCoin {
 private fun parseJsonObject(json: String): Map<String, String> {
     val trimmed = json.trim()
     if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
-        throw InvalidSharePayloadException("Invalid JSON object")
+        throw InvalidSharePayloadException(SharePayloadError.MalformedJson, "Invalid JSON object")
     }
     val inner = trimmed.substring(1, trimmed.length - 1).trim()
     if (inner.isEmpty()) return emptyMap()
@@ -118,7 +187,7 @@ private fun parseJsonObject(json: String): Map<String, String> {
         if (i >= inner.length) break
 
         if (inner[i] != '"') {
-            throw InvalidSharePayloadException("Expected key at position $i")
+            throw InvalidSharePayloadException(SharePayloadError.MalformedJson, "Expected key at position $i")
         }
         i++
         val keyStart = i
@@ -173,7 +242,7 @@ private fun parseJsonObject(json: String): Map<String, String> {
 private fun parseJsonArray(arrayStr: String): List<String> {
     val trimmed = arrayStr.trim()
     if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
-        throw InvalidSharePayloadException("Invalid JSON array")
+        throw InvalidSharePayloadException(SharePayloadError.MalformedJson, "Invalid JSON array")
     }
     val inner = trimmed.substring(1, trimmed.length - 1).trim()
     if (inner.isEmpty()) return emptyList()
@@ -225,7 +294,10 @@ private fun parseBoolean(value: String): Boolean {
     return when (value.lowercase()) {
         "true" -> true
         "false" -> false
-        else -> throw InvalidSharePayloadException("Invalid boolean value: $value")
+        else -> throw InvalidSharePayloadException(
+            SharePayloadError.InvalidBoolean,
+            "Invalid boolean value: $value",
+        )
     }
 }
 

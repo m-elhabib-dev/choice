@@ -1,9 +1,13 @@
 package com.choice.app.ui.templates
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -12,56 +16,58 @@ class TemplatePickerScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    private lateinit var context: Context
+
+    @Before
+    fun setup() {
+        context = ApplicationProvider.getApplicationContext()
+    }
+
     @Test
     fun templatePicker_showsFourTemplates() {
         composeTestRule.setContent {
             TemplatePickerScreen(
-                onTemplateSelected = { _, _ -> },
+                onTemplateSelected = {},
                 onStartBlank = {},
                 onBack = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Breakfast").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Lunch").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Workout").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Movie").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.template_breakfast_name)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.template_lunch_name)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.template_workout_name)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.template_movie_name)).assertIsDisplayed()
     }
 
     @Test
     fun templatePicker_showsStartBlankOption() {
         composeTestRule.setContent {
             TemplatePickerScreen(
-                onTemplateSelected = { _, _ -> },
+                onTemplateSelected = {},
                 onStartBlank = {},
                 onBack = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Start Blank").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.templates_start_blank_title)).assertIsDisplayed()
     }
 
     @Test
-    fun templatePicker_clickingTemplate_callsOnTemplateSelected() {
-        var selectedName = ""
-        var selectedChoices = emptyList<String>()
+    fun templatePicker_clickingTemplate_callsOnTemplateSelectedWithStableId() {
+        var selectedTemplateId = ""
 
         composeTestRule.setContent {
             TemplatePickerScreen(
-                onTemplateSelected = { name, choices ->
-                    selectedName = name
-                    selectedChoices = choices
-                },
+                onTemplateSelected = { templateId -> selectedTemplateId = templateId },
                 onStartBlank = {},
                 onBack = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Breakfast").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.template_breakfast_name)).performClick()
 
-        assert(selectedName == "Breakfast") { "Expected Breakfast, got $selectedName" }
-        assert(selectedChoices == listOf("Ful", "Eggs", "Falafel", "Cheese")) {
-            "Expected correct choices, got $selectedChoices"
+        assert(selectedTemplateId == "breakfast") {
+            "Expected the stable id \"breakfast\", got \"$selectedTemplateId\""
         }
     }
 
@@ -71,13 +77,13 @@ class TemplatePickerScreenTest {
 
         composeTestRule.setContent {
             TemplatePickerScreen(
-                onTemplateSelected = { _, _ -> },
+                onTemplateSelected = {},
                 onStartBlank = { blankCalled = true },
                 onBack = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Start Blank").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.templates_start_blank_title)).performClick()
 
         assert(blankCalled) { "Expected onStartBlank to be called" }
     }
@@ -86,12 +92,12 @@ class TemplatePickerScreenTest {
     fun templatePicker_showsCreateCoinTitle() {
         composeTestRule.setContent {
             TemplatePickerScreen(
-                onTemplateSelected = { _, _ -> },
+                onTemplateSelected = {},
                 onStartBlank = {},
                 onBack = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Create Coin").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.templates_title)).assertIsDisplayed()
     }
 }

@@ -10,21 +10,31 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * Domain code stays free of Android resource dependencies (Principle VI) — the Composable
+ * resolves the final localized message via `stringResource` (see CoinEditScreen.kt).
+ */
+enum class CoinEditError {
+    NAME_BLANK,
+    CHOICE_BLANK,
+    TOO_FEW_CHOICES,
+}
+
 data class ChoiceFieldState(
     val id: Long? = null,
     val text: String = "",
-    val error: String? = null,
+    val error: CoinEditError? = null,
 )
 
 data class CoinEditUiState(
     val coinId: Long? = null,
     val name: String = "",
-    val nameError: String? = null,
+    val nameError: CoinEditError? = null,
     val choices: List<ChoiceFieldState> = emptyList(),
-    val formError: String? = null,
+    val formError: CoinEditError? = null,
     val canSave: Boolean = false,
     val isSaved: Boolean = false,
-    val removeError: String? = null,
+    val removeError: CoinEditError? = null,
     val orderChanged: Boolean = false,
 )
 
@@ -110,7 +120,7 @@ class CoinEditViewModel(
 
     fun removeChoice(index: Int) {
         if (_uiState.value.choices.size <= 2) {
-            _uiState.update { it.copy(removeError = "At least 2 choices are required") }
+            _uiState.update { it.copy(removeError = CoinEditError.TOO_FEW_CHOICES) }
             return
         }
         _uiState.update { state ->
@@ -159,13 +169,13 @@ class CoinEditViewModel(
 
     private fun recompute() {
         val state = _uiState.value
-        val nameError = if (showErrors && state.name.isBlank()) "Name cannot be blank" else null
+        val nameError = if (showErrors && state.name.isBlank()) CoinEditError.NAME_BLANK else null
         val choices = state.choices.map { choice ->
-            val error = if (showErrors && choice.text.isBlank()) "Choice cannot be blank" else null
+            val error = if (showErrors && choice.text.isBlank()) CoinEditError.CHOICE_BLANK else null
             choice.copy(error = error)
         }
         val formError = if (state.choices.size < 2) {
-            "At least 2 choices are required"
+            CoinEditError.TOO_FEW_CHOICES
         } else {
             null
         }

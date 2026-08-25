@@ -1,5 +1,6 @@
 package com.choice.app
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,18 +8,24 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.choice.app.locale.LocaleApplier
 import com.choice.app.ui.CoinViewModelFactory
 import com.choice.app.ui.coinedit.CoinEditScreen
 import com.choice.app.ui.coinflip.CoinFlipScreen
 import com.choice.app.ui.coinsettings.CoinSettingsScreen
 import com.choice.app.ui.history.HistoryScreen
 import com.choice.app.ui.main.MainScreen
+import com.choice.app.ui.settings.SettingsScreen
+import com.choice.app.ui.settings.SettingsViewModel
+import com.choice.app.ui.settings.SettingsViewModelFactory
 import com.choice.app.ui.statistics.StatisticsScreen
 import com.choice.app.ui.templates.TemplatePickerScreen
 import com.choice.app.ui.share.ImportCoinScreen
@@ -26,6 +33,11 @@ import com.choice.app.ui.theme.ChoiceTheme
 import com.choice.app.widget.OpenCoinInAppAction
 
 class MainActivity : ComponentActivity() {
+    // API 26–32 backport path; a no-op on API 33+ (contracts/localization-contract.md §4).
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleApplier.localizedContext(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -82,6 +94,23 @@ private fun ChoiceNavHost(initialPayload: String? = null, openCoinId: Long? = nu
                 onEditCoin = { coinId ->
                     navController.navigate("coinedit?coinId=$coinId")
                 },
+                onSettings = {
+                    navController.navigate("settings")
+                },
+            )
+        }
+
+        composable("settings") {
+            val application = context.applicationContext as ChoiceApplication
+            val factory = SettingsViewModelFactory(
+                context,
+                application.languagePreferenceStore,
+                refreshWidgets = { application.widgetRefreshCoordinator.refreshAll() },
+            )
+            val viewModel: SettingsViewModel = viewModel(factory = factory)
+            SettingsScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
             )
         }
 
@@ -103,13 +132,13 @@ private fun ChoiceNavHost(initialPayload: String? = null, openCoinId: Long? = nu
         }
 
         composable(
-            route = "coinedit?coinId={coinId}&templateName={templateName}",
+            route = "coinedit?coinId={coinId}&templateId={templateId}",
             arguments = listOf(
                 navArgument("coinId") {
                     type = NavType.LongType
                     defaultValue = -1L
                 },
-                navArgument("templateName") {
+                navArgument("templateId") {
                     type = NavType.StringType
                     nullable = true
                     defaultValue = null
@@ -118,15 +147,20 @@ private fun ChoiceNavHost(initialPayload: String? = null, openCoinId: Long? = nu
         ) { backStackEntry ->
             val coinIdArg = backStackEntry.arguments?.getLong("coinId") ?: -1L
             val coinId = if (coinIdArg == -1L) null else coinIdArg
-            val templateName = backStackEntry.arguments?.getString("templateName")
-            val template = templateName?.let { name ->
-                com.choice.app.domain.CoinTemplates.templates.find { it.name == name }
+            val templateId = backStackEntry.arguments?.getString("templateId")
+            // Resolved here, before CoinEditViewModel — the materialization boundary
+            // (data-model.md §4, NV-5): once resolved to a plain String/List<String>, a created
+            // coin can never re-translate on a later language change.
+            val template = templateId?.let { id ->
+                com.choice.app.domain.CoinTemplates.templates.find { it.id == id }
             }
+            val templateName = template?.let { stringResource(it.nameRes) }
+            val templateChoices = template?.let { stringArrayResource(it.choicesRes).toList() }
             val factory = CoinViewModelFactory(
                 appContainer.coinRepository,
                 coinId,
-                template?.name,
-                template?.choices,
+                templateName,
+                templateChoices,
             )
             val viewModel: com.choice.app.ui.coinedit.CoinEditViewModel =
                 viewModel(factory = factory)
@@ -138,8 +172,8 @@ private fun ChoiceNavHost(initialPayload: String? = null, openCoinId: Long? = nu
 
         composable("templates") {
             TemplatePickerScreen(
-                onTemplateSelected = { name, _ ->
-                    navController.navigate("coinedit?templateName=$name")
+                onTemplateSelected = { templateId ->
+                    navController.navigate("coinedit?templateId=$templateId")
                 },
                 onStartBlank = {
                     navController.navigate("coinedit")

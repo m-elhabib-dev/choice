@@ -5,6 +5,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import androidx.core.text.BidiFormatter
+import com.choice.app.R
 
 data class DeleteCoinConfirmationState(
     val coinId: Long,
@@ -19,24 +22,27 @@ fun DeleteCoinConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete Coin") },
+        title = { Text(stringResource(R.string.delete_coin_title)) },
         text = {
             Text(
-                text = "Are you sure you want to delete \"${state.coinName}\"? This action cannot be undone.",
+                text = stringResource(
+                    R.string.delete_coin_message,
+                    BidiFormatter.getInstance().unicodeWrap(state.coinName),
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text(
-                    text = "Delete",
+                    text = stringResource(R.string.delete_coin_confirm),
                     color = MaterialTheme.colorScheme.error,
                 )
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.delete_coin_cancel))
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,

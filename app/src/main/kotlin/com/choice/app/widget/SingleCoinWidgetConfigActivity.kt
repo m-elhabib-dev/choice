@@ -2,6 +2,7 @@ package com.choice.app.widget
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -30,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -38,6 +40,7 @@ import com.choice.app.ChoiceApplication
 import com.choice.app.MainActivity
 import com.choice.app.R
 import com.choice.app.domain.CoinWithChoices
+import com.choice.app.locale.LocaleApplier
 import com.choice.app.ui.theme.ChoiceTheme
 import kotlinx.coroutines.launch
 
@@ -49,6 +52,11 @@ import kotlinx.coroutines.launch
  * logic; only the system path needs `setResult`.
  */
 class SingleCoinWidgetConfigActivity : ComponentActivity() {
+
+    // API 26–32 backport path; a no-op on API 33+ (contracts/localization-contract.md §4, WL-4).
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleApplier.localizedContext(newBase))
+    }
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -184,7 +192,11 @@ private fun CoinPickerContent(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = "${coinWithChoices.choices.size} choices",
+                        text = pluralStringResource(
+                            R.plurals.coin_choice_count,
+                            coinWithChoices.choices.size,
+                            coinWithChoices.choices.size,
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

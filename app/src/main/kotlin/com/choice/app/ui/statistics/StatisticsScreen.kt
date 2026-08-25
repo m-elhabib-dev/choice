@@ -29,15 +29,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.choice.app.R
 import com.choice.app.domain.ChoiceCount
 import com.choice.app.domain.CoinStatistics
 import com.choice.app.domain.Decision
+import com.choice.app.locale.formattingLocale
 import com.choice.app.ui.components.EmptyState
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.choice.app.ui.format.DecisionTimeFormatter
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,12 +53,12 @@ fun StatisticsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Statistics") },
+                title = { Text(stringResource(R.string.statistics_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -69,8 +72,8 @@ fun StatisticsScreen(
     ) { padding ->
         if (uiState.isEmpty) {
             EmptyState(
-                title = "No statistics yet",
-                subtitle = "Accept some decisions to see statistics",
+                title = stringResource(R.string.statistics_empty_title),
+                subtitle = stringResource(R.string.statistics_empty_subtitle),
                 modifier = Modifier.padding(padding),
             )
         } else {
@@ -117,7 +120,7 @@ private fun TotalDecisionsCard(totalDecisions: Int) {
             modifier = Modifier.padding(16.dp),
         ) {
             Text(
-                text = "Total Decisions",
+                text = stringResource(R.string.statistics_total_decisions),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -135,7 +138,7 @@ private fun TotalDecisionsCard(totalDecisions: Int) {
 @Composable
 private fun PerChoiceHeader() {
     Text(
-        text = "Per Choice Breakdown",
+        text = stringResource(R.string.statistics_per_choice_breakdown),
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
@@ -152,9 +155,9 @@ private fun PerChoiceCard(
     val isLeastFrequent = leastFrequent?.choice?.id == choiceCount.choice.id
 
     val label = when {
-        isMostFrequent && isLeastFrequent -> " (most & least frequent)"
-        isMostFrequent -> " (most frequent)"
-        isLeastFrequent -> " (least frequent)"
+        isMostFrequent && isLeastFrequent -> stringResource(R.string.statistics_most_and_least_frequent_suffix)
+        isMostFrequent -> stringResource(R.string.statistics_most_frequent_suffix)
+        isLeastFrequent -> stringResource(R.string.statistics_least_frequent_suffix)
         else -> ""
     }
 
@@ -189,6 +192,7 @@ private fun PerChoiceCard(
 
 @Composable
 private fun MostRecentDecisionCard(decision: Decision) {
+    val formattingLocale = formattingLocale(LocalConfiguration.current.locales[0].language)
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -199,7 +203,7 @@ private fun MostRecentDecisionCard(decision: Decision) {
             modifier = Modifier.padding(16.dp),
         ) {
             Text(
-                text = "Most Recent Decision",
+                text = stringResource(R.string.statistics_most_recent_decision),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -211,16 +215,11 @@ private fun MostRecentDecisionCard(decision: Decision) {
                 modifier = Modifier.padding(top = 4.dp),
             )
             Text(
-                text = formatTimestamp(decision.decidedAt),
+                text = DecisionTimeFormatter.format(decision.decidedAt, formattingLocale, ZoneId.systemDefault()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
     }
-}
-
-private fun formatTimestamp(timestamp: Long): String {
-    val sdf = SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault())
-    return sdf.format(Date(timestamp))
 }

@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">Choice</string>
+    <!-- Brand name — the one intentional exception to "every key has an Arabic counterpart"
+         (contracts/widget-localization-contract.md §2.1). -->
+    <string name="app_name" translatable="false">Choice</string>
 
     <!-- Widgets -->
     <string name="widget_single_coin_label">Single Coin</string>
@@ -20,4 +22,163 @@
     <string name="widget_config_use_favorites_title">Use my favorites</string>
     <string name="widget_config_use_favorites_description">Auto-updating — always shows your current favorited coins</string>
     <string name="widget_config_confirm_selection">Save</string>
+    <string name="cd_widget_open_app">%1$s, Open app</string>
+    <string name="cd_widget_coin_ready">%1$s: Ready to flip</string>
+    <string name="cd_widget_coin_result">%1$s result: %2$s</string>
+    <string name="cd_widget_flip_coin">Flip %1$s</string>
+    <string name="cd_widget_action_for_coin">%1$s %2$s</string>
+
+    <!-- Shared across screens -->
+    <string name="cd_back">Back</string>
+    <string name="cd_edit_coin">Edit coin</string>
+    <string name="cd_statistics">Statistics</string>
+
+    <!-- Main screen -->
+    <string name="cd_create_coin">Create Coin</string>
+    <string name="main_empty_title">No coins yet</string>
+    <string name="main_empty_subtitle">Create your first coin to get started</string>
+    <string name="main_action_create_coin">Create Coin</string>
+    <string name="main_search_placeholder">Search coins...</string>
+    <string name="cd_search">Search</string>
+    <string name="main_section_quick_coins">Quick Coins</string>
+    <string name="main_section_all_coins">All Coins</string>
+    <string name="main_no_results_title">No matching coins</string>
+    <string name="main_no_results_subtitle">Try a different search term</string>
+    <string name="cd_add_to_quick_coins">Add to Quick Coins</string>
+    <string name="cd_remove_from_quick_coins">Remove from Quick Coins</string>
+    <plurals name="coin_choice_count">
+        <item quantity="one">%s choice</item>
+        <item quantity="other">%s choices</item>
+    </plurals>
+
+    <!-- Delete coin confirmation dialog -->
+    <string name="delete_coin_title">Delete Coin</string>
+    <string name="delete_coin_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_coin_confirm">Delete</string>
+    <string name="delete_coin_cancel">Cancel</string>
+
+    <!-- Coin edit screen -->
+    <string name="coin_edit_title_create">Create Coin</string>
+    <string name="coin_edit_title_edit">Edit Coin</string>
+    <string name="coin_edit_name_label">Coin name</string>
+    <string name="coin_edit_choice_label">Choice %1$d</string>
+    <string name="cd_move_choice_up">Move up</string>
+    <string name="cd_move_choice_down">Move down</string>
+    <string name="cd_remove_choice">Remove choice</string>
+    <string name="coin_edit_add_choice">Add Choice</string>
+    <string name="coin_edit_save">Save</string>
+    <string name="coin_edit_error_name_blank">Name cannot be blank</string>
+    <string name="coin_edit_error_choice_blank">Choice cannot be blank</string>
+    <string name="coin_edit_error_too_few_choices">At least 2 choices are required</string>
+
+    <!-- Coin flip (decision) screen -->
+    <string name="cd_share_coin">Share coin</string>
+    <string name="share_chooser_title">Share coin</string>
+    <string name="cd_decision_history">Decision history</string>
+    <string name="cd_coin_settings">Coin settings</string>
+    <string name="coin_flip_action_flip">Flip</string>
+    <string name="coin_flip_your_decision">Your decision:</string>
+    <string name="coin_flip_decision_accepted">Decision accepted</string>
+    <string name="coin_flip_action_accept">Accept</string>
+    <string name="coin_flip_action_flip_again">Flip again</string>
+
+    <!-- Coin settings screen -->
+    <string name="coin_settings_title">Coin Settings</string>
+    <string name="coin_settings_weighted_title">Weighted Selection</string>
+    <string name="coin_settings_weighted_subtitle">Each choice gets a configurable weight</string>
+    <string name="coin_settings_avoid_last_title">Avoid Last Result</string>
+    <string name="coin_settings_avoid_last_subtitle">Exclude the previous result from the next flip</string>
+    <string name="coin_settings_choice_weights_title">Choice Weights</string>
+    <string name="coin_settings_weight_label">Weight</string>
+    <string name="coin_settings_weight_hint">Leave blank for default weight of 1</string>
+    <string name="coin_settings_save">Save Settings</string>
+    <string name="coin_settings_share_coin">Share Coin</string>
+    <string name="coin_settings_import_coin">Import Coin</string>
+    <string name="coin_settings_error_weight_positive">Weight must be a positive whole number</string>
+
+    <!-- Settings screen -->
+    <string name="cd_settings">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_language_label">Language</string>
+    <string name="settings_language_system">System default</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_arabic">العربية</string>
+
+    <!-- Coin templates (domain/CoinTemplates.kt) — id is the stable lookup key; only the name and
+         choices are localized. Every string-array below must keep the same item count as its
+         values-ar/ counterpart (VR-11). -->
+    <string name="template_breakfast_name">Breakfast</string>
+    <string-array name="template_breakfast_choices">
+        <item>Ful</item>
+        <item>Eggs</item>
+        <item>Falafel</item>
+        <item>Cheese</item>
+    </string-array>
+    <string name="template_lunch_name">Lunch</string>
+    <string-array name="template_lunch_choices">
+        <item>Rice</item>
+        <item>Pasta</item>
+        <item>Chicken</item>
+        <item>Lentils</item>
+    </string-array>
+    <string name="template_workout_name">Workout</string>
+    <string-array name="template_workout_choices">
+        <item>Chest</item>
+        <item>Back</item>
+        <item>Legs</item>
+        <item>Full Body</item>
+    </string-array>
+    <string name="template_movie_name">Movie</string>
+    <string-array name="template_movie_choices">
+        <item>Interstellar</item>
+        <item>Dune</item>
+        <item>Batman</item>
+        <item>The Matrix</item>
+    </string-array>
+
+    <!-- Template picker screen -->
+    <string name="templates_title">Create Coin</string>
+    <string name="templates_choose_template">Choose a template</string>
+    <string name="templates_start_blank_title">Start Blank</string>
+    <string name="templates_start_blank_subtitle">Create a coin from scratch</string>
+
+    <!-- History screen -->
+    <string name="history_title">History</string>
+    <string name="history_empty_title">No decisions yet</string>
+    <string name="history_empty_subtitle">Accepted decisions will appear here</string>
+
+    <!-- Statistics screen -->
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_empty_title">No statistics yet</string>
+    <string name="statistics_empty_subtitle">Accept some decisions to see statistics</string>
+    <string name="statistics_total_decisions">Total Decisions</string>
+    <string name="statistics_per_choice_breakdown">Per Choice Breakdown</string>
+    <string name="statistics_most_frequent_suffix"> (most frequent)</string>
+    <string name="statistics_least_frequent_suffix"> (least frequent)</string>
+    <string name="statistics_most_and_least_frequent_suffix"> (most &amp; least frequent)</string>
+    <string name="statistics_most_recent_decision">Most Recent Decision</string>
+
+    <!-- Share / import screen -->
+    <string name="share_import_title">Import Coin</string>
+    <string name="share_import_instructions">Paste a shared coin payload below to import it as a new coin.</string>
+    <string name="share_import_placeholder">Paste coin payload here...</string>
+    <string name="share_import_action">Import</string>
+    <string name="share_error_empty_payload">Please paste a coin payload</string>
+    <string name="share_error_invalid_json">The payload isn\'t valid — check that you copied the whole thing</string>
+    <string name="share_error_missing_schema_version">The payload is missing its version number</string>
+    <string name="share_error_unsupported_schema_version">This payload uses version %1$d, which this version of Choice doesn\'t support</string>
+    <string name="share_error_name_required">The coin needs a name</string>
+    <string name="share_error_name_blank">The coin name can\'t be blank</string>
+    <string name="share_error_name_too_long">The coin name can\'t be longer than %1$d characters</string>
+    <string name="share_error_choices_required">The coin needs its choices</string>
+    <string name="share_error_too_few_choices">At least 2 choices are required</string>
+    <string name="share_error_choice_text_required">A choice is missing its text</string>
+    <string name="share_error_choice_text_blank">A choice can\'t be blank</string>
+    <string name="share_error_choice_text_too_long">A choice can\'t be longer than %1$d characters</string>
+    <string name="share_error_weight_not_a_number">A choice\'s weight must be a whole number</string>
+    <string name="share_error_weight_not_positive">A choice\'s weight must be a positive whole number</string>
+    <string name="share_error_missing_weighted_enabled">The payload is missing its weighting setting</string>
+    <string name="share_error_missing_avoid_last_result_enabled">The payload is missing its avoid-last-result setting</string>
+    <string name="share_error_invalid_boolean">The payload has an invalid true/false value</string>
+    <string name="share_error_import_failed">Import failed: %1$s</string>
 </resources>

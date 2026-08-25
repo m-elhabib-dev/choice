@@ -3,16 +3,33 @@ package com.choice.app
 import android.app.Application
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
+import com.choice.app.locale.LocaleApplier
+import com.choice.app.locale.LanguagePreferenceStore
+import com.choice.app.locale.SharedPreferencesLanguageStore
+import com.choice.app.locale.resolveLanguageTag
+import com.choice.app.locale.systemLanguageTags
 import com.choice.app.widget.WidgetRefreshCoordinator
 
 class ChoiceApplication : Application() {
     lateinit var appContainer: AppContainer
         private set
 
+    lateinit var languagePreferenceStore: LanguagePreferenceStore
+        private set
+
+    lateinit var widgetRefreshCoordinator: WidgetRefreshCoordinator
+        private set
+
     override fun onCreate() {
         super.onCreate()
+        languagePreferenceStore = SharedPreferencesLanguageStore(this)
+        LocaleApplier.apply(
+            this,
+            resolveLanguageTag(languagePreferenceStore.read(), systemLanguageTags()),
+        )
         appContainer = AppContainer(this)
-        WidgetRefreshCoordinator(this, appContainer.coinRepository).start()
+        widgetRefreshCoordinator = WidgetRefreshCoordinator(this, appContainer.coinRepository)
+        widgetRefreshCoordinator.start()
     }
 }
 

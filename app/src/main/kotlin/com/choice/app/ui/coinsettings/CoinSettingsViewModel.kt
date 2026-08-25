@@ -14,11 +14,19 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * Domain code stays free of Android resource dependencies (Principle VI) — the Composable
+ * resolves the final localized message via `stringResource` (see CoinSettingsScreen.kt).
+ */
+enum class CoinSettingsError {
+    WEIGHT_NOT_POSITIVE,
+}
+
 data class WeightFieldState(
     val choiceId: Long,
     val choiceText: String,
     val weightText: String,
-    val error: String? = null,
+    val error: CoinSettingsError? = null,
 )
 
 data class CoinSettingsUiState(
@@ -110,7 +118,7 @@ class CoinSettingsViewModel(
                         if (field.weightText.isNotBlank()) {
                             val parsed = field.weightText.toIntOrNull()
                             if (parsed == null || parsed < 1) {
-                                field.copy(error = "Weight must be a positive whole number")
+                                field.copy(error = CoinSettingsError.WEIGHT_NOT_POSITIVE)
                             } else {
                                 field
                             }

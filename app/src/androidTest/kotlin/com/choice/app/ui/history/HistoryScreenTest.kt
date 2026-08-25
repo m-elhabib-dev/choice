@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import kotlinx.coroutines.runBlocking
@@ -20,6 +21,7 @@ class HistoryScreenTest {
 
     private lateinit var database: ChoiceDatabase
     private lateinit var repository: CoinRepositoryImpl
+    private val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
     @Before
     fun setup() {
@@ -53,7 +55,7 @@ class HistoryScreenTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.isEmpty }
 
-        composeTestRule.onNodeWithText("No decisions yet").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.history_empty_title)).assertIsDisplayed()
     }
 
     @Test
@@ -137,7 +139,7 @@ class HistoryScreenTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.decisions.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("No decisions yet").assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(R.string.history_empty_title)).assertDoesNotExist()
     }
 
     @Test
@@ -156,6 +158,6 @@ class HistoryScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText("History").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.history_title)).assertIsDisplayed()
     }
 }

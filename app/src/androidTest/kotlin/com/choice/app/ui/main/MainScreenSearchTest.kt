@@ -1,5 +1,6 @@
 package com.choice.app.ui.main
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -7,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import kotlinx.coroutines.runBlocking
@@ -22,13 +24,12 @@ class MainScreenSearchTest {
 
     private lateinit var database: ChoiceDatabase
     private lateinit var repository: CoinRepositoryImpl
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            ChoiceDatabase::class.java,
-        ).build()
+        context = ApplicationProvider.getApplicationContext()
+        database = Room.inMemoryDatabaseBuilder(context, ChoiceDatabase::class.java).build()
         repository = CoinRepositoryImpl(database.coinDao())
     }
 
@@ -58,8 +59,8 @@ class MainScreenSearchTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.allCoins.size >= 3 }
 
-        composeTestRule.onNodeWithText("Search coins...").performClick()
-        composeTestRule.onNodeWithText("Search coins...").performTextInput("Break")
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performTextInput("Break")
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.filteredAllCoins.size == 1 }
 
@@ -86,13 +87,13 @@ class MainScreenSearchTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.allCoins.size >= 2 }
 
-        composeTestRule.onNodeWithText("Search coins...").performClick()
-        composeTestRule.onNodeWithText("Search coins...").performTextInput("Break")
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performTextInput("Break")
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.filteredAllCoins.size == 1 }
 
-        composeTestRule.onNodeWithText("Search coins...").performClick()
-        composeTestRule.onNodeWithText("Search coins...").performTextInput("")
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performTextInput("")
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.filteredAllCoins.size == 2 }
 
@@ -119,11 +120,11 @@ class MainScreenSearchTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.allCoins.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Search coins...").performClick()
-        composeTestRule.onNodeWithText("Search coins...").performTextInput("XYZ123")
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.main_search_placeholder)).performTextInput("XYZ123")
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.isNoResults }
 
-        composeTestRule.onNodeWithText("No matching coins").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.main_no_results_title)).assertIsDisplayed()
     }
 }

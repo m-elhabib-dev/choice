@@ -35,7 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.choice.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +49,7 @@ fun CoinSettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val shareChooserTitle = stringResource(R.string.share_chooser_title)
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onBack()
@@ -55,12 +58,12 @@ fun CoinSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Coin Settings") },
+                title = { Text(stringResource(R.string.coin_settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -93,12 +96,12 @@ fun CoinSettingsScreen(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Weighted Selection",
+                        text = stringResource(R.string.coin_settings_weighted_title),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     Text(
-                        text = "Each choice gets a configurable weight",
+                        text = stringResource(R.string.coin_settings_weighted_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -117,12 +120,12 @@ fun CoinSettingsScreen(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Avoid Last Result",
+                        text = stringResource(R.string.coin_settings_avoid_last_title),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     Text(
-                        text = "Exclude the previous result from the next flip",
+                        text = stringResource(R.string.coin_settings_avoid_last_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -136,7 +139,7 @@ fun CoinSettingsScreen(
 
             if (uiState.weightedEnabled) {
                 Text(
-                    text = "Choice Weights",
+                    text = stringResource(R.string.coin_settings_choice_weights_title),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
@@ -156,10 +159,10 @@ fun CoinSettingsScreen(
                         OutlinedTextField(
                             value = field.weightText,
                             onValueChange = { viewModel.updateWeight(index, it) },
-                            label = { Text("Weight") },
+                            label = { Text(stringResource(R.string.coin_settings_weight_label)) },
                             isError = field.error != null,
                             supportingText = {
-                                field.error?.let { Text(it) }
+                                field.error?.let { Text(stringResource(it.messageRes())) }
                             },
                             singleLine = true,
                             modifier = Modifier
@@ -170,7 +173,7 @@ fun CoinSettingsScreen(
                 }
 
                 Text(
-                    text = "Leave blank for default weight of 1",
+                    text = stringResource(R.string.coin_settings_weight_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -190,7 +193,7 @@ fun CoinSettingsScreen(
                 onClick = { viewModel.save() },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Save Settings")
+                Text(stringResource(R.string.coin_settings_save))
             }
 
             OutlinedButton(
@@ -201,7 +204,7 @@ fun CoinSettingsScreen(
                         type = "text/plain"
                         putExtra(Intent.EXTRA_TEXT, payload)
                     }
-                    context.startActivity(Intent.createChooser(sendIntent, "Share coin"))
+                    context.startActivity(Intent.createChooser(sendIntent, shareChooserTitle))
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -210,7 +213,7 @@ fun CoinSettingsScreen(
                     contentDescription = null,
                     modifier = Modifier.padding(end = 8.dp),
                 )
-                Text("Share Coin")
+                Text(stringResource(R.string.coin_settings_share_coin))
             }
 
             OutlinedButton(
@@ -222,8 +225,12 @@ fun CoinSettingsScreen(
                     contentDescription = null,
                     modifier = Modifier.padding(end = 8.dp),
                 )
-                Text("Import Coin")
+                Text(stringResource(R.string.coin_settings_import_coin))
             }
         }
     }
+}
+
+private fun CoinSettingsError.messageRes(): Int = when (this) {
+    CoinSettingsError.WEIGHT_NOT_POSITIVE -> R.string.coin_settings_error_weight_positive
 }

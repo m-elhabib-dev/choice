@@ -26,7 +26,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.choice.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,12 +48,12 @@ fun ImportCoinScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Import Coin") },
+                title = { Text(stringResource(R.string.share_import_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -72,7 +74,7 @@ fun ImportCoinScreen(
             verticalArrangement = Arrangement.Top,
         ) {
             Text(
-                text = "Paste a shared coin payload below to import it as a new coin.",
+                text = stringResource(R.string.share_import_instructions),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -83,16 +85,17 @@ fun ImportCoinScreen(
                 value = uiState.inputText,
                 onValueChange = { viewModel.updateInputText(it) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Paste coin payload here...") },
+                placeholder = { Text(stringResource(R.string.share_import_placeholder)) },
                 minLines = 6,
                 maxLines = 12,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (uiState.errorMessage != null) {
+            uiState.error?.let { error ->
+                val localized = error.toLocalizedMessage()
                 Text(
-                    text = uiState.errorMessage!!,
+                    text = stringResource(localized.messageRes, *localized.args.toTypedArray()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(bottom = 8.dp),
@@ -110,7 +113,7 @@ fun ImportCoinScreen(
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
                 } else {
-                    Text("Import")
+                    Text(stringResource(R.string.share_import_action))
                 }
             }
         }

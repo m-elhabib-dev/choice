@@ -2,6 +2,7 @@ package com.choice.app.widget
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -44,6 +45,7 @@ import com.choice.app.ChoiceApplication
 import com.choice.app.MainActivity
 import com.choice.app.R
 import com.choice.app.domain.CoinWithChoices
+import com.choice.app.locale.LocaleApplier
 import com.choice.app.ui.theme.ChoiceTheme
 import kotlinx.coroutines.launch
 
@@ -54,6 +56,11 @@ import kotlinx.coroutines.launch
  * favorites (auto-updating)" toggle instead of a single-select picker.
  */
 class QuickCoinsWidgetConfigActivity : ComponentActivity() {
+
+    // API 26–32 backport path; a no-op on API 33+ (contracts/localization-contract.md §4, WL-4).
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleApplier.localizedContext(newBase))
+    }
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 

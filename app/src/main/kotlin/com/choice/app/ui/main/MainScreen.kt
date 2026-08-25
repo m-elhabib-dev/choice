@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
@@ -36,8 +37,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.choice.app.R
 import com.choice.app.ui.components.DeleteCoinConfirmationDialog
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -47,6 +51,7 @@ fun MainScreen(
     onCoinClick: (Long) -> Unit,
     onCreateCoin: () -> Unit,
     onEditCoin: (Long) -> Unit,
+    onSettings: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -61,12 +66,18 @@ fun MainScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Choice") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
+                    IconButton(onClick = onSettings) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = stringResource(R.string.cd_settings),
+                        )
+                    }
                     IconButton(onClick = onCreateCoin) {
                         Icon(
                             imageVector = Icons.Filled.Add,
-                            contentDescription = "Create Coin",
+                            contentDescription = stringResource(R.string.cd_create_coin),
                         )
                     }
                 },
@@ -88,7 +99,7 @@ fun MainScreen(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = "No coins yet",
+                    text = stringResource(R.string.main_empty_title),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
@@ -96,7 +107,7 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Create your first coin to get started",
+                    text = stringResource(R.string.main_empty_subtitle),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -104,7 +115,7 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = onCreateCoin) {
-                    Text("Create Coin")
+                    Text(stringResource(R.string.main_action_create_coin))
                 }
             }
         } else {
@@ -120,11 +131,11 @@ fun MainScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp),
-                        placeholder = { Text("Search coins...") },
+                        placeholder = { Text(stringResource(R.string.main_search_placeholder)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Filled.Search,
-                                contentDescription = "Search",
+                                contentDescription = stringResource(R.string.cd_search),
                             )
                         },
                         singleLine = true,
@@ -134,7 +145,7 @@ fun MainScreen(
                 if (uiState.quickCoins.isNotEmpty()) {
                     item {
                         Text(
-                            text = "Quick Coins",
+                            text = stringResource(R.string.main_section_quick_coins),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.SemiBold,
@@ -165,7 +176,7 @@ fun MainScreen(
 
                 item {
                     Text(
-                        text = "All Coins",
+                        text = stringResource(R.string.main_section_all_coins),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.SemiBold,
@@ -182,12 +193,12 @@ fun MainScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text = "No matching coins",
+                                text = stringResource(R.string.main_no_results_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                text = "Try a different search term",
+                                text = stringResource(R.string.main_no_results_subtitle),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp),
@@ -256,21 +267,23 @@ private fun CoinCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "$choiceCount choices",
+                    text = pluralStringResource(R.plurals.coin_choice_count, choiceCount, choiceCount.toString()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 IconButton(onClick = onToggleFavorite) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                        contentDescription = if (isFavorite) "Remove from Quick Coins" else "Add to Quick Coins",
+                        contentDescription = stringResource(
+                            if (isFavorite) R.string.cd_remove_from_quick_coins else R.string.cd_add_to_quick_coins,
+                        ),
                         tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = "Edit coin",
+                        contentDescription = stringResource(R.string.cd_edit_coin),
                     )
                 }
             }

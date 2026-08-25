@@ -45,6 +45,13 @@ android {
     buildFeatures {
         compose = true
     }
+
+    lint {
+        // contracts/localization-contract.md §5.2 SR-2/SR-7: every values/ key must have an
+        // Arabic counterpart in values-ar/, and no stray Arabic-only key may exist either.
+        // Build-blocking so a translation gap is caught at build time, not by inspection.
+        error += setOf("MissingTranslation", "ExtraTranslation")
+    }
 }
 
 dependencies {

@@ -27,27 +27,30 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.choice.app.R
 import com.choice.app.domain.CoinTemplate
 import com.choice.app.domain.CoinTemplates
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TemplatePickerScreen(
-    onTemplateSelected: (name: String, choices: List<String>) -> Unit,
+    onTemplateSelected: (templateId: String) -> Unit,
     onStartBlank: () -> Unit,
     onBack: () -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Create Coin") },
+                title = { Text(stringResource(R.string.templates_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -68,7 +71,7 @@ fun TemplatePickerScreen(
         ) {
             item {
                 Text(
-                    text = "Choose a template",
+                    text = stringResource(R.string.templates_choose_template),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 4.dp),
@@ -78,7 +81,7 @@ fun TemplatePickerScreen(
             items(CoinTemplates.templates) { template ->
                 TemplateCard(
                     template = template,
-                    onClick = { onTemplateSelected(template.name, template.choices) },
+                    onClick = { onTemplateSelected(template.id) },
                 )
             }
 
@@ -102,13 +105,13 @@ fun TemplatePickerScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            text = "Start Blank",
+                            text = stringResource(R.string.templates_start_blank_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = "Create a coin from scratch",
+                            text = stringResource(R.string.templates_start_blank_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp),
@@ -125,6 +128,9 @@ private fun TemplateCard(
     template: CoinTemplate,
     onClick: () -> Unit,
 ) {
+    val name = stringResource(template.nameRes)
+    val choices = stringArrayResource(template.choicesRes)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,13 +145,13 @@ private fun TemplateCard(
                 .padding(16.dp),
         ) {
             Text(
-                text = template.name,
+                text = name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = template.choices.joinToString(", "),
+                text = choices.joinToString(", "),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp),

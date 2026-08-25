@@ -1,11 +1,13 @@
 package com.choice.app.ui.coinflip
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import kotlinx.coroutines.flow.first
@@ -22,13 +24,12 @@ class CoinFlipScreenAcceptOverrideTest {
 
     private lateinit var database: ChoiceDatabase
     private lateinit var repository: CoinRepositoryImpl
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            ChoiceDatabase::class.java,
-        ).build()
+        context = ApplicationProvider.getApplicationContext()
+        database = Room.inMemoryDatabaseBuilder(context, ChoiceDatabase::class.java).build()
         repository = CoinRepositoryImpl(database.coinDao())
     }
 
@@ -57,7 +58,7 @@ class CoinFlipScreenAcceptOverrideTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
@@ -85,11 +86,11 @@ class CoinFlipScreenAcceptOverrideTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
-        composeTestRule.onNodeWithText("Accept").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_accept)).assertIsDisplayed()
     }
 
     @Test
@@ -112,11 +113,11 @@ class CoinFlipScreenAcceptOverrideTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
-        composeTestRule.onNodeWithText("Flip again").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip_again)).assertIsDisplayed()
     }
 
     @Test
@@ -139,17 +140,17 @@ class CoinFlipScreenAcceptOverrideTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
-        composeTestRule.onNodeWithText("Accept").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_accept)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.accepted }
 
-        composeTestRule.onNodeWithText("Decision accepted").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Accept").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Flip again").assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_decision_accepted)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_accept)).assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip_again)).assertDoesNotExist()
     }
 
     @Test
@@ -172,13 +173,13 @@ class CoinFlipScreenAcceptOverrideTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
         val firstResult = viewModel.uiState.value.result!!
 
-        composeTestRule.onNodeWithText("Flip again").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip_again)).performClick()
 
         composeTestRule.waitUntil(5_000) {
             viewModel.uiState.value.result != null && viewModel.uiState.value.result != firstResult
@@ -189,8 +190,8 @@ class CoinFlipScreenAcceptOverrideTest {
         // Either way, the Accept/Flip again buttons should be visible (not accepted)
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
-        composeTestRule.onNodeWithText("Accept").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Flip again").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_accept)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip_again)).assertIsDisplayed()
     }
 
     @Test
@@ -213,11 +214,11 @@ class CoinFlipScreenAcceptOverrideTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
-        composeTestRule.onNodeWithText("Flip again").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip_again)).performClick()
 
         composeTestRule.waitUntil(5_000) { !viewModel.uiState.value.accepted }
 
@@ -247,10 +248,10 @@ class CoinFlipScreenAcceptOverrideTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.coinName.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Flip").performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).performClick()
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.result != null }
 
-        composeTestRule.onNodeWithText("Flip").assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(R.string.coin_flip_action_flip)).assertDoesNotExist()
     }
 }

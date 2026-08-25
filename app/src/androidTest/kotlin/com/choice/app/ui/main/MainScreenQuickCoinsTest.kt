@@ -1,5 +1,6 @@
 package com.choice.app.ui.main
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -7,6 +8,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.choice.app.R
 import com.choice.app.data.CoinRepositoryImpl
 import com.choice.app.data.local.ChoiceDatabase
 import kotlinx.coroutines.flow.first
@@ -23,13 +25,12 @@ class MainScreenQuickCoinsTest {
 
     private lateinit var database: ChoiceDatabase
     private lateinit var repository: CoinRepositoryImpl
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            ChoiceDatabase::class.java,
-        ).build()
+        context = ApplicationProvider.getApplicationContext()
+        database = Room.inMemoryDatabaseBuilder(context, ChoiceDatabase::class.java).build()
         repository = CoinRepositoryImpl(database.coinDao())
     }
 
@@ -58,7 +59,7 @@ class MainScreenQuickCoinsTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.quickCoins.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Quick Coins").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.main_section_quick_coins)).assertIsDisplayed()
         composeTestRule.onAllNodesWithText("Favorite Coin").onFirst().assertIsDisplayed()
     }
 
@@ -116,7 +117,7 @@ class MainScreenQuickCoinsTest {
 
         composeTestRule.waitUntil(5_000) { viewModel.uiState.value.allCoins.isNotEmpty() }
 
-        composeTestRule.onNodeWithText("Quick Coins").assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(R.string.main_section_quick_coins)).assertDoesNotExist()
     }
 
     @Test

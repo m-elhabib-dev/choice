@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Test-only manifest, merged into the instrumentation APK alongside the app manifest.
+  Declares activities that exist only for instrumented tests and are never part of the
+  shipped app (contracts/localization-contract.md — RtlLayoutTest, T048).
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="com.choice.app.locale.RtlLayoutTest$ArabicActivity"
+            android:exported="false" />
+    </application>
+</manifest>
